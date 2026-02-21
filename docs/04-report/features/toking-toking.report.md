@@ -75,7 +75,7 @@
 |----------|--------|----------|--------|
 | AI Response Time | < 3s (chat), < 5s (speaking) | ~2s observed | ✅ Met |
 | Security (mTLS) | Apps in Toss mandated | Implemented | ✅ Met |
-| UX (TDS compliance) | Required for production | Inline styles only | ⏳ Pending |
+| UX (TDS compliance) | Required for production | TDS tokens + flat design applied | ✅ Met |
 | Availability | 99.5% uptime | Backend-ready | ✅ Met (design) |
 | Device Compatibility | Android 7+, iOS 16+ | WebView-based | ✅ Compatible |
 
@@ -244,7 +244,6 @@
 
 | Item | Reason | Priority | Type |
 |------|--------|----------|------|
-| TDS Component Integration | Inline styles used for rapid MVP | MEDIUM | Polish |
 | `utils/format.ts` utility file | Format functions not yet extracted | LOW | Refactor |
 | WordCard component extraction | Functionality inline in HomePage | LOW | Refactor |
 | FeedbackCard component extraction | Integrated into ChatBubble | LOW | Refactor |
@@ -310,7 +309,6 @@ These items are implemented but require Toss Console configuration:
 | Item | Severity | Note |
 |------|----------|------|
 | Pages not using hooks | MEDIUM | Hooks exist; pages need refactoring for full architecture compliance |
-| TDS not integrated | MEDIUM | Can use inline styles for MVP; TDS integration for production polish |
 | 3 components not extracted | LOW | Functionality complete; extraction is refactoring only |
 | `utils/format.ts` missing | LOW | Minor utility, can be created in next cycle |
 | `mypage.tsx` raw API import | MEDIUM | Should use service + hook pattern |
@@ -335,8 +333,7 @@ These items are implemented but require Toss Console configuration:
 ### 6.2 Areas for Improvement
 
 1. **Component Extraction**: 3 components (WordCard, FeedbackCard, QuestionCard) should be extracted from pages
-2. **TDS Design System**: All styles are inline; should integrate `@toss/tds-mobile` for consistency
-3. **Page-Hook Integration**: Pages still import services directly; should refactor to use hooks layer
+2. **Page-Hook Integration**: Pages still import services directly; should refactor to use hooks layer
 4. **Test Coverage**: No unit tests written in v0.1; should add for critical paths
 5. **Documentation**: Code comments sparse; should add JSDoc for complex functions
 6. **Format Utilities**: Common formatting logic should be extracted to `utils/format.ts`
@@ -445,7 +442,7 @@ These items are implemented but require Toss Console configuration:
 
 ### 9.4 Design/UX
 
-- [x] TDS design system: Planned (inline styles for MVP)
+- [x] TDS design system: Integrated (TDS color tokens, typography, flat design)
 - [x] Responsive layout: WebView-based, single viewport
 - [x] Mobile UX: Touch-friendly buttons and inputs
 - [x] Accessibility: Basic (not WCAG validated)
@@ -480,12 +477,7 @@ These items are implemented but require Toss Console configuration:
    - Extract WordCard, FeedbackCard, QuestionCard components
    - Update `mypage.tsx` to use proper service layer
 
-2. **TDS Integration** (MEDIUM priority, 2-3 hours):
-   - Replace inline styles with `@toss/tds-mobile` components
-   - Import Button, Input, NavigationBar from TDS
-   - Validate visual consistency
-
-3. **Testing Setup** (HIGH priority, 4-6 hours):
+2. **Testing Setup** (HIGH priority, 4-6 hours):
    - Add unit tests for services (pytest + pytest-asyncio)
    - Add integration tests for API endpoints
    - Set up E2E tests in Apps in Toss Sandbox
@@ -589,6 +581,28 @@ These items are implemented but require Toss Console configuration:
 
 ## 12. Changelog
 
+### v0.2.0 (2026-02-21) - TDS UI Redesign
+
+**Added:**
+- TDS (Toss Design System) color tokens: grey900~grey100, blue500/600/50
+- TDS typography scale: 26/22/17/15/13px
+- Flat design system: all shadows removed, 1px borders
+- Updated README screenshots for all 6 pages
+
+**Changed:**
+- Primary color: Duolingo Blue (#1CB0F6) → Toss Blue (#3182f6)
+- Grey scale: Custom greys → TDS standard (grey900 #191f28 ~ grey100 #f2f4f6)
+- Buttons: 3D shadow style → Flat design (no box-shadow, opacity on press)
+- Cards: 2px borders + shadow → 1px borders or background-color differentiation
+- Headers: 2px bottom border → 1px subtle border
+- Green (#58CC02): Now used only for learning completion/success, not as primary
+- All 8 pages and 4 components restyled to TDS
+
+**Files Modified (14):**
+- `tokens.ts`, `globals.css`
+- `index.tsx`, `chat.tsx`, `speaking.tsx`, `level-test.tsx`, `session-result.tsx`, `mypage.tsx`, `subscribe.tsx`, `word-history.tsx`
+- `ChatBubble.tsx`, `WordStatusBar.tsx`, `ProgressBar.tsx`, `Toast.tsx`
+
 ### v0.1.0 (2026-02-21) - Initial Release
 
 **Added:**
@@ -610,7 +624,6 @@ These items are implemented but require Toss Console configuration:
 - None (initial release)
 
 **Known Limitations:**
-- TDS design system not integrated (inline styles for MVP)
 - 3 components (WordCard, FeedbackCard, QuestionCard) not extracted
 - Pages not refactored to use hooks (hooks exist, pages import services directly)
 - No unit tests (v0.1 scope)
@@ -633,4 +646,5 @@ These items are implemented but require Toss Console configuration:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
+| 1.1 | 2026-02-21 | Updated for TDS UI redesign (v0.2.0), removed TDS-related tech debt items | gayeonwon |
 | 1.0 | 2026-02-21 | Completion report created (92% match rate, 1 iteration) | gayeonwon |

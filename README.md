@@ -204,12 +204,14 @@ tokingtoking/
 
 ## 디자인 시스템
 
-Duolingo에서 영감을 받은 깔끔한 UI를 구현했습니다.
+토스 디자인 시스템(TDS)을 기반으로 하되, 학습 앱에 필요한 Duolingo 스타일의 gamification 요소를 블렌딩했습니다.
 
-- **색상 팔레트**: Green(#58CC02), Blue(#1CB0F6), Orange(#FF9600)
-- **카드 스타일**: `border: 2px solid`, `box-shadow: 0 2px 0`으로 입체감
-- **버튼**: 3D depth shadow (`0 4px 0`)로 누르는 느낌
-- **아이콘**: 이모지 대신 CSS로 구현한 체크마크, 뱃지, 아바타
+- **Primary**: Toss Blue (#3182f6) - 토스 앱 안에서 자연스러운 주요 액션 색상
+- **Learning Accent**: Duolingo Green (#58CC02) - 학습 완료/성공 표시 전용
+- **Grey Scale**: TDS 표준 (grey900 #191f28 ~ grey100 #f2f4f6)
+- **Typography**: TDS 스케일 (26/22/17/15/13px)
+- **카드/버튼**: Flat design - 1px border, 배경색 차이로 구분 (3D shadow 없음)
+- **헤더**: 56px 높이, 1px subtle border (토스 패턴)
 - **애니메이션**: fadeIn, slideDown, progressFill, bounce 등
 
 ---

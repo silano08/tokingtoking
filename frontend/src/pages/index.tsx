@@ -109,7 +109,7 @@ export default function HomePage() {
     return (
       <div style={styles.page}>
         <div style={styles.hero}>
-          <div style={styles.logoCircle}>T</div>
+          <img src="/logo.png" alt="토킹토킹" style={styles.logoImage} />
           <h1 style={styles.heroTitle}>TokingToking</h1>
           <p style={styles.heroSubtitle}>AI와 대화하며 영어 단어를 마스터하세요</p>
           <button
@@ -266,17 +266,9 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     background: `linear-gradient(180deg, ${colors.blueLight} 0%, ${colors.white} 60%)`,
   },
-  logoCircle: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    backgroundColor: colors.blue,
-    color: colors.white,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '36px',
-    fontWeight: 800,
+  logoImage: {
+    width: '100px',
+    height: '100px',
     marginBottom: `${spacing.xl}px`,
   },
   heroTitle: {

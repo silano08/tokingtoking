@@ -267,8 +267,8 @@ const styles: Record<string, React.CSSProperties> = {
     background: `linear-gradient(180deg, ${colors.blueLight} 0%, ${colors.white} 60%)`,
   },
   logoImage: {
-    width: '100px',
-    height: '100px',
+    width: '140px',
+    height: '140px',
     marginBottom: `${spacing.xl}px`,
   },
   heroTitle: {

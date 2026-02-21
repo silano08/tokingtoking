@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSessionStore } from '@/store/sessionStore'
 import { useAuthStore } from '@/store/authStore'
-import { colors, spacing, radius, font, shadows, primaryBtnStyle, secondaryBtnStyle } from '@/styles/tokens'
+import { colors, spacing, radius, font, primaryBtnStyle, secondaryBtnStyle } from '@/styles/tokens'
 
 export default function SessionResultPage() {
   const { summary } = useSessionStore()
@@ -100,8 +100,11 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.white,
   },
   header: {
-    padding: `${spacing.md}px ${spacing.lg}px`,
-    borderBottom: `2px solid ${colors.border}`,
+    height: '56px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: `0 ${spacing.lg}px`,
+    borderBottom: `1px solid ${colors.border}`,
   },
   headerTitle: {
     ...font.h3,
@@ -127,7 +130,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: `${spacing.lg}px`,
-    boxShadow: shadows.button,
   },
   checkMark: {
     fontSize: '36px',
@@ -142,20 +144,17 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: `${spacing.xxl}px`,
   },
   sectionTitle: {
-    ...font.bodyBold,
-    color: colors.text,
+    ...font.caption,
+    fontWeight: 600,
+    color: colors.textSecondary,
     marginBottom: `${spacing.md}px`,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-    fontSize: '13px',
   },
   wordResult: {
     padding: `14px`,
     backgroundColor: colors.white,
-    borderRadius: `${radius.md}px`,
+    borderRadius: `${radius.lg}px`,
     marginBottom: `${spacing.sm}px`,
-    border: `2px solid ${colors.border}`,
-    boxShadow: shadows.card,
+    border: `1px solid ${colors.border}`,
   },
   wordHeader: {
     display: 'flex',
@@ -209,8 +208,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: `${spacing.md}px`,
     backgroundColor: colors.white,
     borderRadius: `${radius.md}px`,
-    border: `2px solid ${colors.border}`,
-    boxShadow: shadows.card,
   },
   statNumber: {
     ...font.h2,

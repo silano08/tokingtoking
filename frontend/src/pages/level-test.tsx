@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { levelTestService } from '@/services/levelTestService'
 import { toast } from '@/store/toastStore'
 import type { LevelTestQuestion, LevelTestResult } from '@/types/levelTest'
-import { colors, spacing, radius, font, shadows, primaryBtnStyle } from '@/styles/tokens'
+import { colors, spacing, radius, font, primaryBtnStyle } from '@/styles/tokens'
 
 export default function LevelTestPage() {
   const { updateUser } = useAuthStore()
@@ -172,8 +172,9 @@ const styles: Record<string, React.CSSProperties> = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    padding: `${spacing.md}px ${spacing.lg}px`,
-    borderBottom: `2px solid ${colors.border}`,
+    height: '56px',
+    padding: `0 ${spacing.lg}px`,
+    borderBottom: `1px solid ${colors.border}`,
   },
   headerTitle: {
     ...font.h3,
@@ -200,25 +201,22 @@ const styles: Record<string, React.CSSProperties> = {
     width: '100%',
     padding: `${spacing.lg}px`,
     borderRadius: `${radius.lg}px`,
-    border: `2px solid ${colors.border}`,
+    border: `1px solid ${colors.border}`,
     backgroundColor: colors.white,
     ...font.body,
     color: colors.text,
     cursor: 'pointer',
     textAlign: 'left',
-    boxShadow: shadows.card,
-    marginBottom: '2px',
   },
   optionSelected: {
     borderColor: colors.blue,
     backgroundColor: colors.blueLight,
-    boxShadow: `0 4px 0 ${colors.blueDark}`,
   },
   radio: {
     width: '22px',
     height: '22px',
     borderRadius: '50%',
-    border: `2px solid ${colors.border}`,
+    border: `1.5px solid ${colors.border}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -239,7 +237,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   footer: {
     padding: `${spacing.lg}px`,
-    borderTop: `2px solid ${colors.border}`,
+    borderTop: `1px solid ${colors.border}`,
   },
   // Result
   resultContainer: {
@@ -257,7 +255,7 @@ const styles: Record<string, React.CSSProperties> = {
     height: '120px',
     borderRadius: '50%',
     backgroundColor: colors.greenBg,
-    border: `4px solid ${colors.green}`,
+    border: `2px solid ${colors.green}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

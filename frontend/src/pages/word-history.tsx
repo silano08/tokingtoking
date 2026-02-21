@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import api from '@/services/api'
-import { colors, spacing, radius, font, shadows, headerStyle, backBtnStyle, headerTitleStyle } from '@/styles/tokens'
+import { colors, spacing, radius, font, headerStyle, backBtnStyle, headerTitleStyle } from '@/styles/tokens'
 
 interface WordEntry {
   id: string
@@ -89,7 +89,7 @@ export default function WordHistoryPage() {
                   <div style={styles.timelineGutter}>
                     <div style={{
                       ...styles.timelineDot,
-                      backgroundColor: isToday ? colors.green : colors.border,
+                      backgroundColor: isToday ? colors.blue : colors.border,
                     }} />
                     {dayIdx < history.length - 1 && (
                       <div style={styles.timelineLine} />
@@ -101,7 +101,7 @@ export default function WordHistoryPage() {
                     <div style={styles.dayHeader}>
                       <span style={{
                         ...styles.dayDate,
-                        color: isToday ? colors.green : colors.text,
+                        color: isToday ? colors.blue : colors.text,
                       }}>
                         {isToday ? '오늘' : display}
                       </span>
@@ -147,18 +147,17 @@ const styles: Record<string, React.CSSProperties> = {
     gap: `${spacing.xs}px`,
     marginBottom: `${spacing.xxl}px`,
     padding: `${spacing.lg}px`,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.blueLight,
     borderRadius: `${radius.lg}px`,
-    border: `2px solid ${colors.greenLight}`,
   },
   summaryNumber: {
     fontSize: '32px',
     fontWeight: 800,
-    color: colors.green,
+    color: colors.blue,
   },
   summaryLabel: {
     ...font.bodyBold,
-    color: colors.greenDark,
+    color: colors.blueDark,
   },
   // Loading
   loadingContainer: {
@@ -169,7 +168,7 @@ const styles: Record<string, React.CSSProperties> = {
   skeleton: {
     height: '80px',
     borderRadius: `${radius.md}px`,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.bg,
     animation: 'pulse 1.5s ease-in-out infinite',
   },
   // Empty
@@ -191,11 +190,10 @@ const styles: Record<string, React.CSSProperties> = {
     padding: `${spacing.md}px ${spacing.xxl}px`,
     borderRadius: `${radius.lg}px`,
     border: 'none',
-    backgroundColor: colors.green,
+    backgroundColor: colors.blue,
     color: colors.white,
     ...font.bodyBold,
     cursor: 'pointer',
-    boxShadow: shadows.button,
   },
   // Timeline
   timeline: {
@@ -252,10 +250,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   wordItem: {
     padding: `${spacing.md}px`,
-    backgroundColor: colors.white,
-    borderRadius: `${radius.md}px`,
-    border: `2px solid ${colors.border}`,
-    boxShadow: shadows.card,
+    backgroundColor: colors.bg,
+    borderRadius: `${radius.lg}px`,
   },
   wordItemHeader: {
     display: 'flex',
@@ -271,7 +267,7 @@ const styles: Record<string, React.CSSProperties> = {
   wordItemPos: {
     ...font.small,
     color: colors.textTertiary,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.white,
     padding: `0 ${spacing.sm}px`,
     borderRadius: `${radius.sm}px`,
   },

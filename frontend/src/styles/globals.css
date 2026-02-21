@@ -1,4 +1,4 @@
-/* TokingToking Global Styles - Duolingo-inspired */
+/* TokingToking Global Styles - Toss Design System base */
 
 * {
   margin: 0;
@@ -11,7 +11,7 @@ html, body {
     'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #4B4B4B;
+  color: #191f28;
   background: #FFFFFF;
   overflow-x: hidden;
 }
@@ -22,7 +22,7 @@ html, body {
   display: none;
 }
 
-/* Button behaviors */
+/* Button behaviors - TDS flat press */
 button {
   font-family: inherit;
   transition: opacity 0.15s, transform 0.1s;
@@ -30,7 +30,7 @@ button {
 }
 
 button:active:not(:disabled) {
-  transform: scale(0.97) translateY(2px);
+  opacity: 0.7;
 }
 
 button:disabled {
@@ -125,7 +125,7 @@ input:focus, textarea:focus {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #AFAFAF;
+  background: #8b95a1;
   margin: 0 2px;
   animation: dotPulse 1.2s infinite;
 }

@@ -158,7 +158,7 @@ export default function ChatPage() {
           disabled={!input.trim() || isLoading}
           style={{
             ...styles.sendButton,
-            backgroundColor: input.trim() ? colors.green : colors.surface,
+            backgroundColor: input.trim() ? colors.blue : colors.bg,
             color: input.trim() ? colors.white : colors.textTertiary,
           }}
         >
@@ -193,29 +193,28 @@ const styles: Record<string, React.CSSProperties> = {
     padding: `${spacing.md}px 14px`,
     backgroundColor: colors.bg,
     borderRadius: `${radius.lg}px`,
-    border: `1px solid ${colors.border}`,
   },
   inputArea: {
     display: 'flex',
     gap: `${spacing.sm}px`,
     padding: `${spacing.md}px ${spacing.lg}px`,
-    borderTop: `2px solid ${colors.border}`,
+    borderTop: `1px solid ${colors.border}`,
     backgroundColor: colors.white,
   },
   input: {
     flex: 1,
-    height: '44px',
-    borderRadius: `${radius.full}px`,
-    border: `2px solid ${colors.border}`,
+    height: '48px',
+    borderRadius: `${radius.md}px`,
+    border: `1px solid ${colors.border}`,
     padding: `0 ${spacing.lg}px`,
     ...font.body,
     color: colors.text,
     backgroundColor: colors.white,
   },
   sendButton: {
-    width: '44px',
-    height: '44px',
-    borderRadius: '50%',
+    width: '48px',
+    height: '48px',
+    borderRadius: `${radius.md}px`,
     border: 'none',
     fontSize: '20px',
     fontWeight: 700,

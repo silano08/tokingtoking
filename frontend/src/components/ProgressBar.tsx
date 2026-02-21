@@ -51,17 +51,17 @@ const styles: Record<string, React.CSSProperties> = {
   counter: {
     ...font.caption,
     fontWeight: 700,
-    color: colors.green,
+    color: colors.blue,
   },
   track: {
-    height: '12px',
-    backgroundColor: colors.surface,
+    height: '8px',
+    backgroundColor: colors.bg,
     borderRadius: `${radius.full}px`,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: colors.green,
+    backgroundColor: colors.blue,
     borderRadius: `${radius.full}px`,
     transition: 'width 0.4s ease',
     animation: 'progressFill 0.6s ease-out',

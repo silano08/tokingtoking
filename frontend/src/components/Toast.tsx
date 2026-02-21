@@ -4,7 +4,7 @@ import { colors, spacing, radius, font } from '@/styles/tokens'
 
 const BG: Record<ToastType, string> = {
   info: colors.text,
-  success: colors.greenDark,
+  success: colors.green,
   error: colors.red,
   premium: `linear-gradient(135deg, #6366F1, ${colors.purple})`,
 }
@@ -71,7 +71,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: `${radius.lg}px`,
     padding: `14px ${spacing.lg}px`,
     color: colors.textOnPrimary,
-    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
     animation: 'slideDown 0.3s ease-out',
     cursor: 'pointer',
   },

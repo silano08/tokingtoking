@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from '@/store/toastStore'
-import { colors, spacing, radius, font, shadows, headerStyle, backBtnStyle, headerTitleStyle, primaryBtnStyle } from '@/styles/tokens'
+import { colors, spacing, radius, font, headerStyle, backBtnStyle, headerTitleStyle, primaryBtnStyle } from '@/styles/tokens'
 
 interface Product {
   id: string
@@ -150,10 +150,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   features: {
     padding: `${spacing.xl}px`,
-    backgroundColor: colors.greenBg,
+    backgroundColor: colors.bg,
     borderRadius: `${radius.lg}px`,
     marginBottom: `${spacing.xxl}px`,
-    border: `2px solid ${colors.greenLight}`,
   },
   featureRow: {
     display: 'flex',
@@ -188,16 +187,14 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'relative',
     padding: `${spacing.xl}px`,
     borderRadius: `${radius.lg}px`,
-    border: `2px solid ${colors.border}`,
+    border: `1px solid ${colors.border}`,
     backgroundColor: colors.white,
     cursor: 'pointer',
     textAlign: 'left',
-    boxShadow: shadows.card,
   },
   productSelected: {
     borderColor: colors.blue,
     backgroundColor: colors.blueLight,
-    boxShadow: `0 4px 0 ${colors.blueDark}`,
   },
   badge: {
     position: 'absolute',
@@ -242,7 +239,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: `${spacing.lg}px`,
-    boxShadow: shadows.button,
   },
   activeCheck: {
     fontSize: '28px',

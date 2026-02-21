@@ -50,7 +50,7 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: `${spacing.md}px ${spacing.lg}px`,
     backgroundColor: colors.white,
-    borderBottom: `2px solid ${colors.border}`,
+    borderBottom: `1px solid ${colors.border}`,
   },
   headerRow: {
     display: 'flex',
@@ -62,13 +62,11 @@ const styles: Record<string, React.CSSProperties> = {
     ...font.small,
     color: colors.textSecondary,
     fontWeight: 600,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
   },
   counter: {
     ...font.caption,
     fontWeight: 700,
-    color: colors.green,
+    color: colors.blue,
   },
   wordList: {
     display: 'flex',
@@ -88,12 +86,12 @@ const styles: Record<string, React.CSSProperties> = {
   chipUsed: {
     backgroundColor: colors.greenBg,
     color: colors.greenDark,
-    border: `2px solid ${colors.green}`,
+    border: `1px solid ${colors.green}`,
   },
   chipPending: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.bg,
     color: colors.text,
-    border: `2px solid ${colors.border}`,
+    border: `1px solid ${colors.border}`,
   },
   checkIcon: {
     width: '18px',
@@ -110,7 +108,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.white,
   },
   checkEmpty: {
-    border: `2px solid ${colors.border}`,
+    border: `1px solid ${colors.border}`,
     backgroundColor: colors.white,
   },
   wordText: {

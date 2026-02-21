@@ -245,12 +245,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: `${spacing.md}px 14px`,
     backgroundColor: colors.bg,
     borderRadius: `${radius.lg}px`,
-    border: `1px solid ${colors.border}`,
   },
   voiceArea: {
     padding: `${spacing.xl}px ${spacing.lg}px`,
-    borderTop: `2px solid ${colors.border}`,
-    backgroundColor: colors.bg,
+    borderTop: `1px solid ${colors.border}`,
+    backgroundColor: colors.white,
   },
   voiceHint: {
     textAlign: 'center',

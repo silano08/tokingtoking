@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import api from '@/services/api'
-import { colors, spacing, radius, font, shadows, headerStyle, backBtnStyle, headerTitleStyle, primaryBtnStyle } from '@/styles/tokens'
+import { colors, spacing, radius, font, headerStyle, backBtnStyle, headerTitleStyle, primaryBtnStyle } from '@/styles/tokens'
 
 const LEVEL_LABELS: Record<string, string> = {
   beginner: 'Beginner',
@@ -141,7 +141,7 @@ const styles: Record<string, React.CSSProperties> = {
   content: {
     padding: `${spacing.lg}px`,
   },
-  // Level Card
+  // Level Card - TDS style
   levelCard: {
     display: 'flex',
     alignItems: 'center',
@@ -150,8 +150,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.blueLight,
     borderRadius: `${radius.lg}px`,
     marginBottom: `${spacing.lg}px`,
-    border: `2px solid ${colors.blue}`,
-    boxShadow: `0 4px 0 ${colors.blueDark}`,
   },
   levelCircle: {
     width: '48px',
@@ -183,9 +181,9 @@ const styles: Record<string, React.CSSProperties> = {
   retestBtn: {
     padding: `${spacing.sm}px ${spacing.lg}px`,
     borderRadius: `${radius.full}px`,
-    border: `2px solid ${colors.blueDark}`,
+    border: 'none',
     backgroundColor: colors.white,
-    color: colors.blueDark,
+    color: colors.blue,
     ...font.caption,
     fontWeight: 700,
     cursor: 'pointer',
@@ -199,14 +197,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statCard: {
     padding: `${spacing.lg}px ${spacing.sm}px`,
-    backgroundColor: colors.white,
-    borderRadius: `${radius.md}px`,
+    backgroundColor: colors.bg,
+    borderRadius: `${radius.lg}px`,
     textAlign: 'center',
-    border: `2px solid ${colors.border}`,
-    boxShadow: shadows.card,
   },
   streakCard: {
-    borderColor: colors.orange,
     backgroundColor: colors.orangeLight,
   },
   statValue: {
@@ -224,11 +219,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   sectionTitle: {
     ...font.caption,
-    fontWeight: 700,
+    fontWeight: 600,
     color: colors.textSecondary,
     marginBottom: `${spacing.md}px`,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
   },
   // History link
   historyLink: {
@@ -237,11 +230,10 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     width: '100%',
     padding: `${spacing.lg}px`,
-    borderRadius: `${radius.md}px`,
-    border: `2px solid ${colors.border}`,
-    backgroundColor: colors.white,
+    borderRadius: `${radius.lg}px`,
+    border: 'none',
+    backgroundColor: colors.bg,
     cursor: 'pointer',
-    boxShadow: shadows.card,
   },
   historyLinkText: {
     ...font.bodyBold,
@@ -254,15 +246,13 @@ const styles: Record<string, React.CSSProperties> = {
   // Subscription
   subCard: {
     padding: `${spacing.xl}px`,
-    backgroundColor: colors.white,
+    backgroundColor: colors.bg,
     borderRadius: `${radius.lg}px`,
-    border: `2px solid ${colors.border}`,
-    boxShadow: shadows.card,
   },
   proBadge: {
     display: 'inline-block',
     padding: `${spacing.xs}px ${spacing.md}px`,
-    backgroundColor: colors.green,
+    backgroundColor: colors.blue,
     color: colors.white,
     borderRadius: `${radius.sm}px`,
     ...font.small,

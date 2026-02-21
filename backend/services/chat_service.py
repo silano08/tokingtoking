@@ -206,6 +206,7 @@ def send_message(user_id: str, session_id: str, content: str, mode: str = "chat"
             "word_usage": words_used,
             "feedback": feedback,
             "hint": ai_response.get("hint"),
+            "grammar_correction": ai_response.get("grammar_correction"),
         },
         "session_status": {
             "words_used": words_used,

@@ -26,6 +26,13 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           {message.content}
         </div>
 
+        {isUser && message.grammar_correction && (
+          <div style={styles.grammarCorrection}>
+            <span style={styles.grammarIcon}>&#9998;</span>
+            <span>{message.grammar_correction}</span>
+          </div>
+        )}
+
         {showFeedback && message.feedback && (
           <div style={styles.feedbackCard}>
             <div style={styles.feedbackTitle}>Feedback</div>
@@ -142,6 +149,24 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     color: colors.orange,
     fontSize: '15px',
+  },
+  grammarCorrection: {
+    marginTop: `${spacing.xs}px`,
+    padding: `${spacing.sm}px ${spacing.md}px`,
+    backgroundColor: '#FFF8E1',
+    borderRadius: `${radius.sm}px`,
+    ...font.caption,
+    color: '#6D4C00',
+    maxWidth: '260px',
+    display: 'flex',
+    gap: `${spacing.sm}px`,
+    alignItems: 'flex-start',
+    lineHeight: '1.5',
+  },
+  grammarIcon: {
+    flexShrink: 0,
+    fontSize: '12px',
+    marginTop: '1px',
   },
   hint: {
     marginTop: `${spacing.sm}px`,

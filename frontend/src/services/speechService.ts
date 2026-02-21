@@ -8,7 +8,7 @@ export async function transcribeAudio(
   audioBlob: Blob,
   sessionId: string
 ): Promise<{
-  message: { role: string; content: string; feedback?: any; hint?: string }
+  message: { role: string; content: string; feedback?: any; hint?: string; grammar_correction?: string | null }
   session_status: { words_used: Record<string, boolean>; completed_count: number; is_completed: boolean }
   transcription: { raw: string; processed: string }
   summary?: any

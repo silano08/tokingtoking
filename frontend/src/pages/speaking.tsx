@@ -19,6 +19,7 @@ export default function SpeakingPage() {
     isLoading,
     startSession,
     addMessage,
+    updateLastUserMessage,
     updateStatus,
     setSummary,
     setLoading,
@@ -80,6 +81,9 @@ export default function SpeakingPage() {
         return { messages: msgs }
       })
 
+      if (response.message.grammar_correction) {
+        updateLastUserMessage({ grammar_correction: response.message.grammar_correction })
+      }
       const aiMessage: ChatMessage = {
         role: response.message.role as 'user' | 'assistant',
         content: response.message.content,
@@ -132,6 +136,9 @@ export default function SpeakingPage() {
 
     try {
       const response = await chatService.sendSpeakingMessage(sessionId, transcribedText)
+      if (response.message.grammar_correction) {
+        updateLastUserMessage({ grammar_correction: response.message.grammar_correction })
+      }
       addMessage(response.message)
       updateStatus(response.session_status)
 

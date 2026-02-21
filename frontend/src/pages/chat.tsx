@@ -17,6 +17,7 @@ export default function ChatPage() {
     isLoading,
     startSession,
     addMessage,
+    updateLastUserMessage,
     updateStatus,
     setSummary,
     setLoading,
@@ -74,6 +75,9 @@ export default function ChatPage() {
 
     try {
       const response = await chatService.sendMessage(sessionId, userMessage)
+      if (response.message.grammar_correction) {
+        updateLastUserMessage({ grammar_correction: response.message.grammar_correction })
+      }
       addMessage(response.message)
       updateStatus(response.session_status)
 

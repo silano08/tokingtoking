@@ -4,6 +4,7 @@ export interface ChatMessage {
   word_usage?: Record<string, boolean>
   feedback?: SpeakingFeedback | null
   hint?: string | null
+  grammar_correction?: string | null
 }
 
 export interface SpeakingFeedback {

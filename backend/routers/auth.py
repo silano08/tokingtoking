@@ -3,6 +3,8 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import JWTError, jwt
 
+from datetime import date
+
 from config import settings
 from db.supabase_client import supabase
 from middleware.auth import create_access_token, create_refresh_token, get_current_user_id
@@ -77,7 +79,7 @@ async def dev_login():
     if len(existing.data) == 0:
         result = (
             supabase.table("users")
-            .insert({"toss_user_key": dev_key, "level": "intermediate"})
+            .insert({"toss_user_key": dev_key, "level": "intermediate", "is_premium": True})
             .execute()
         )
         user = result.data[0]
@@ -85,6 +87,15 @@ async def dev_login():
     else:
         user = existing.data[0]
         is_new_user = False
+
+        # Admin: 매번 프리미엄 활성화 + 오늘 세션 초기화
+        supabase.table("users").update({"is_premium": True}).eq("id", user["id"]).execute()
+        user["is_premium"] = True
+
+        today = date.today().isoformat()
+        supabase.table("study_sessions").delete().eq(
+            "user_id", user["id"]
+        ).gte("started_at", f"{today}T00:00:00").execute()
 
     access_token = create_access_token(user["id"])
     refresh_token = create_refresh_token(user["id"])

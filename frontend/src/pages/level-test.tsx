@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useAuthStore } from '@/store/authStore'
 import { levelTestService } from '@/services/levelTestService'
+import { toast } from '@/store/toastStore'
 import type { LevelTestQuestion, LevelTestResult } from '@/types/levelTest'
+import { colors, spacing, radius, font, shadows, primaryBtnStyle } from '@/styles/tokens'
 
 export default function LevelTestPage() {
   const { updateUser } = useAuthStore()
@@ -22,7 +24,7 @@ export default function LevelTestPage() {
       const data = await levelTestService.getQuestions()
       setQuestions(data.questions)
     } catch {
-      alert('문제를 불러오는데 실패했습니다.')
+      toast.error('문제를 불러오는데 실패했습니다.')
     } finally {
       setIsLoading(false)
     }
@@ -60,7 +62,7 @@ export default function LevelTestPage() {
       setResult(testResult)
       updateUser({ level: testResult.assigned_level as any })
     } catch {
-      alert('제출에 실패했습니다.')
+      toast.error('제출에 실패했습니다. 다시 시도해주세요.')
     } finally {
       setIsLoading(false)
     }
@@ -69,7 +71,7 @@ export default function LevelTestPage() {
   if (isLoading && questions.length === 0) {
     return (
       <div style={styles.center}>
-        <div>문제를 불러오는 중...</div>
+        <div style={styles.loadingText}>문제를 불러오는 중...</div>
       </div>
     )
   }
@@ -78,15 +80,16 @@ export default function LevelTestPage() {
     return (
       <div style={styles.page}>
         <div style={styles.resultContainer}>
-          <div style={styles.resultEmoji}>🎉</div>
-          <div style={styles.resultTitle}>레벨 테스트 완료!</div>
-          <div style={styles.resultScore}>
-            {result.score} / {result.total}
+          <div style={styles.resultCircle}>
+            <span style={styles.resultScore}>
+              {result.score}/{result.total}
+            </span>
           </div>
-          <div style={styles.resultLevel}>{result.message}</div>
+          <div style={styles.resultTitle}>레벨 테스트 완료!</div>
+          <div style={styles.resultMessage}>{result.message}</div>
           <button
             onClick={() => (window.location.href = '/')}
-            style={styles.startButton}
+            style={primaryBtnStyle}
           >
             학습 시작하기
           </button>
@@ -99,48 +102,50 @@ export default function LevelTestPage() {
 
   return (
     <div style={styles.page}>
+      {/* Header */}
       <div style={styles.header}>
         <span style={styles.headerTitle}>레벨 테스트</span>
       </div>
 
-      <ProgressBar
-        current={currentIndex + 1}
-        total={questions.length}
-        label="Question"
-      />
+      <ProgressBar current={currentIndex + 1} total={questions.length} label="Question" />
 
+      {/* Question */}
       <div style={styles.questionArea}>
         <div style={styles.questionText}>{question?.question_text}</div>
 
         <div style={styles.options}>
-          {question?.options?.map((option, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSelectOption(option)}
-              style={{
-                ...styles.optionButton,
-                ...(selectedOption === option ? styles.selectedOption : {}),
-              }}
-            >
-              <span style={styles.optionCircle}>
-                {selectedOption === option ? '●' : '○'}
-              </span>
-              {option}
-            </button>
-          ))}
+          {question?.options?.map((option, idx) => {
+            const isSelected = selectedOption === option
+            return (
+              <button
+                key={idx}
+                onClick={() => handleSelectOption(option)}
+                style={{
+                  ...styles.optionBtn,
+                  ...(isSelected ? styles.optionSelected : {}),
+                }}
+              >
+                <span style={{
+                  ...styles.radio,
+                  ...(isSelected ? styles.radioSelected : {}),
+                }}>
+                  {isSelected && <span style={styles.radioDot} />}
+                </span>
+                <span style={styles.optionText}>{option}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
+      {/* Footer */}
       <div style={styles.footer}>
         <button
           onClick={handleNext}
           disabled={!selectedOption || isLoading}
-          style={{
-            ...styles.nextButton,
-            opacity: selectedOption ? 1 : 0.5,
-          }}
+          style={primaryBtnStyle}
         >
-          {currentIndex < questions.length - 1 ? '다음 →' : '제출하기'}
+          {currentIndex < questions.length - 1 ? '다음' : '제출하기'}
         </button>
       </div>
     </div>
@@ -152,7 +157,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   center: {
     display: 'flex',
@@ -160,108 +165,117 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     height: '100vh',
   },
+  loadingText: {
+    ...font.body,
+    color: colors.textSecondary,
+  },
   header: {
     display: 'flex',
     alignItems: 'center',
-    padding: '12px 16px',
-    borderBottom: '1px solid #E5E8EB',
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    borderBottom: `2px solid ${colors.border}`,
   },
   headerTitle: {
-    fontSize: '17px',
-    fontWeight: 700,
+    ...font.h3,
+    color: colors.text,
   },
   questionArea: {
     flex: 1,
-    padding: '24px 16px',
+    padding: `${spacing.xxl}px ${spacing.lg}px`,
   },
   questionText: {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: '#333D4B',
-    marginBottom: '24px',
-    lineHeight: '1.5',
+    ...font.h2,
+    color: colors.text,
+    marginBottom: `${spacing.xxl}px`,
   },
   options: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: `${spacing.md}px`,
   },
-  optionButton: {
+  optionBtn: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: `${spacing.md}px`,
     width: '100%',
-    padding: '16px',
-    borderRadius: '12px',
-    border: '1px solid #E5E8EB',
-    backgroundColor: '#FFFFFF',
-    fontSize: '15px',
-    color: '#333D4B',
+    padding: `${spacing.lg}px`,
+    borderRadius: `${radius.lg}px`,
+    border: `2px solid ${colors.border}`,
+    backgroundColor: colors.white,
+    ...font.body,
+    color: colors.text,
     cursor: 'pointer',
-    textAlign: 'left' as const,
+    textAlign: 'left',
+    boxShadow: shadows.card,
+    marginBottom: '2px',
   },
-  selectedOption: {
-    borderColor: '#3182F6',
-    backgroundColor: '#EBF4FF',
+  optionSelected: {
+    borderColor: colors.blue,
+    backgroundColor: colors.blueLight,
+    boxShadow: `0 4px 0 ${colors.blueDark}`,
   },
-  optionCircle: {
-    fontSize: '16px',
-    color: '#3182F6',
+  radio: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    border: `2px solid ${colors.border}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  radioSelected: {
+    borderColor: colors.blue,
+    backgroundColor: colors.white,
+  },
+  radioDot: {
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    backgroundColor: colors.blue,
+  },
+  optionText: {
+    flex: 1,
   },
   footer: {
-    padding: '16px',
-    borderTop: '1px solid #E5E8EB',
+    padding: `${spacing.lg}px`,
+    borderTop: `2px solid ${colors.border}`,
   },
-  nextButton: {
-    width: '100%',
-    height: '52px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '17px',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
+  // Result
   resultContainer: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    padding: '24px',
-    textAlign: 'center' as const,
+    padding: `${spacing.xxl}px`,
+    textAlign: 'center',
+    animation: 'scaleIn 0.5s ease-out',
   },
-  resultEmoji: {
-    fontSize: '64px',
-    marginBottom: '16px',
-  },
-  resultTitle: {
-    fontSize: '24px',
-    fontWeight: 800,
-    marginBottom: '12px',
+  resultCircle: {
+    width: '120px',
+    height: '120px',
+    borderRadius: '50%',
+    backgroundColor: colors.greenBg,
+    border: `4px solid ${colors.green}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: `${spacing.xxl}px`,
   },
   resultScore: {
-    fontSize: '18px',
-    color: '#3182F6',
-    fontWeight: 700,
-    marginBottom: '8px',
+    fontSize: '24px',
+    fontWeight: 800,
+    color: colors.green,
   },
-  resultLevel: {
-    fontSize: '16px',
-    color: '#6B7684',
-    marginBottom: '32px',
+  resultTitle: {
+    ...font.h1,
+    color: colors.text,
+    marginBottom: `${spacing.sm}px`,
   },
-  startButton: {
-    width: '100%',
-    maxWidth: '320px',
-    height: '52px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '17px',
-    fontWeight: 700,
-    cursor: 'pointer',
+  resultMessage: {
+    ...font.body,
+    color: colors.textSecondary,
+    marginBottom: `${spacing.xxxl}px`,
   },
 }

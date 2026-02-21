@@ -5,16 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import settings
+from middleware.logging import LoggingMiddleware, setup_json_logging
 from routers import auth, chat, history, iap, level_test, speaking, vocab
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("toking-toking")
+setup_json_logging()
+logger = logging.getLogger("toking-api")
 
 app = FastAPI(
     title="TokingToking API",
     description="AI 영어 어휘 학습 앱 - 앱인토스",
     version="0.1.0",
 )
+
+# Logging middleware (innermost = runs first)
+app.add_middleware(LoggingMiddleware)
 
 # CORS
 origins = [o.strip() for o in settings.cors_origins.split(",")]

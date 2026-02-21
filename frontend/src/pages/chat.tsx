@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ChatBubble } from '@/components/ChatBubble'
 import { WordStatusBar } from '@/components/WordStatusBar'
 import { useSessionStore } from '@/store/sessionStore'
+import { useAuthStore } from '@/store/authStore'
 import { chatService } from '@/services/chatService'
 import { vocabService } from '@/services/vocabService'
+import { toast } from '@/store/toastStore'
+import { colors, spacing, radius, font, headerStyle, backBtnStyle, headerTitleStyle } from '@/styles/tokens'
 
 export default function ChatPage() {
   const {
@@ -35,37 +38,27 @@ export default function ChatPage() {
   const initSession = async () => {
     try {
       setLoading(true)
-      // URL 파라미터에서 단어 ID 추출
       const params = new URLSearchParams(window.location.search)
       const wordIds = params.get('words')?.split(',') ?? []
 
       if (wordIds.length < 3) {
-        // 단어가 없으면 랜덤 출제
         const words = await vocabService.getRandomWords(3)
         const ids = words.map((w) => w.id)
         const session = await chatService.createSession('chat', ids)
-        startSession(
-          session.session_id,
-          'chat',
-          session.target_words,
-          session.initial_message
-        )
+        startSession(session.session_id, 'chat', session.target_words, session.initial_message)
       } else {
         const session = await chatService.createSession('chat', wordIds)
-        startSession(
-          session.session_id,
-          'chat',
-          session.target_words,
-          session.initial_message
-        )
+        startSession(session.session_id, 'chat', session.target_words, session.initial_message)
       }
     } catch (err: any) {
       if (err?.response?.status === 429) {
-        alert(err.response.data?.detail || '일일 무료 학습 횟수를 초과했습니다.')
-        window.location.href = '/subscribe'
+        toast.premium('오늘의 무료 학습을 모두 사용했어요', {
+          label: '홈으로 돌아가기',
+          onClick: () => (window.location.href = '/'),
+        })
         return
       }
-      alert('세션 시작에 실패했습니다.')
+      toast.error('세션 시작에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -86,10 +79,18 @@ export default function ChatPage() {
 
       if (response.session_status.is_completed && response.summary) {
         setSummary(response.summary)
-        // 완료 시 결과 페이지로 이동
+
+        const user = useAuthStore.getState().user
+        if (user && !user.is_premium) {
+          toast.premium('잘 하셨어요! 스피킹으로도 연습해보는 건 어때요?', {
+            label: '스피킹 알아보기',
+            onClick: () => (window.location.href = '/subscribe'),
+          })
+        }
+
         setTimeout(() => {
           window.location.href = `/session-result?session=${sessionId}`
-        }, 1500)
+        }, 3000)
       }
     } catch {
       addMessage({
@@ -110,43 +111,44 @@ export default function ChatPage() {
 
   return (
     <div style={styles.page}>
-      {/* 헤더 */}
-      <div style={styles.header}>
-        <button onClick={() => window.history.back()} style={styles.backButton}>
-          ←
+      {/* Header */}
+      <div style={headerStyle}>
+        <button onClick={() => window.history.back()} style={backBtnStyle}>
+          &#8592;
         </button>
-        <span style={styles.headerTitle}>채팅 학습</span>
+        <span style={headerTitleStyle}>채팅 학습</span>
       </div>
 
-      {/* 단어 상태 바 */}
+      {/* Word Status */}
       {targetWords.length > 0 && sessionStatus && (
-        <WordStatusBar
-          targetWords={targetWords}
-          wordsUsed={sessionStatus.words_used}
-        />
+        <WordStatusBar targetWords={targetWords} wordsUsed={sessionStatus.words_used} />
       )}
 
-      {/* 채팅 영역 */}
+      {/* Chat Area */}
       <div style={styles.chatArea}>
         {messages.map((msg, idx) => (
           <ChatBubble key={idx} message={msg} />
         ))}
         {isLoading && (
           <div style={styles.typing}>
-            <div style={styles.typingDots}>🤖 입력 중...</div>
+            <div style={styles.typingBubble}>
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 입력 영역 */}
+      {/* Input Area */}
       <div style={styles.inputArea}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="메시지를 입력하세요..."
+          placeholder="영어로 대화해보세요..."
           disabled={isLoading || sessionStatus?.is_completed}
           style={styles.input}
           maxLength={500}
@@ -154,9 +156,13 @@ export default function ChatPage() {
         <button
           onClick={handleSend}
           disabled={!input.trim() || isLoading}
-          style={styles.sendButton}
+          style={{
+            ...styles.sendButton,
+            backgroundColor: input.trim() ? colors.green : colors.surface,
+            color: input.trim() ? colors.white : colors.textTertiary,
+          }}
         >
-          전송
+          &#8593;
         </button>
       </div>
     </div>
@@ -168,65 +174,55 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px 16px',
-    borderBottom: '1px solid #E5E8EB',
-    backgroundColor: '#FFFFFF',
-  },
-  backButton: {
-    border: 'none',
-    background: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    padding: '4px 8px',
-  },
-  headerTitle: {
-    fontSize: '17px',
-    fontWeight: 700,
-    marginLeft: '8px',
+    backgroundColor: colors.white,
   },
   chatArea: {
     flex: 1,
-    overflowY: 'auto' as const,
-    padding: '16px 0',
+    overflowY: 'auto',
+    padding: `${spacing.lg}px 0`,
+    backgroundColor: colors.white,
   },
   typing: {
-    padding: '0 16px',
-    marginBottom: '12px',
+    padding: `0 ${spacing.lg}px`,
+    marginBottom: `${spacing.md}px`,
   },
-  typingDots: {
-    fontSize: '14px',
-    color: '#8B95A1',
+  typingBubble: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: `${spacing.md}px 14px`,
+    backgroundColor: colors.bg,
+    borderRadius: `${radius.lg}px`,
+    border: `1px solid ${colors.border}`,
   },
   inputArea: {
     display: 'flex',
-    gap: '8px',
-    padding: '12px 16px',
-    borderTop: '1px solid #E5E8EB',
-    backgroundColor: '#FFFFFF',
+    gap: `${spacing.sm}px`,
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    borderTop: `2px solid ${colors.border}`,
+    backgroundColor: colors.white,
   },
   input: {
     flex: 1,
     height: '44px',
-    borderRadius: '22px',
-    border: '1px solid #E5E8EB',
-    padding: '0 16px',
-    fontSize: '15px',
-    outline: 'none',
+    borderRadius: `${radius.full}px`,
+    border: `2px solid ${colors.border}`,
+    padding: `0 ${spacing.lg}px`,
+    ...font.body,
+    color: colors.text,
+    backgroundColor: colors.white,
   },
   sendButton: {
+    width: '44px',
     height: '44px',
-    padding: '0 20px',
-    borderRadius: '22px',
+    borderRadius: '50%',
     border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '15px',
-    fontWeight: 600,
+    fontSize: '20px',
+    fontWeight: 700,
     cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
 }

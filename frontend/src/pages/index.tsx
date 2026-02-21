@@ -1,57 +1,71 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { vocabService } from '@/services/vocabService'
+import { toast } from '@/store/toastStore'
+import api from '@/services/api'
 import type { VocabWord } from '@/types/vocab'
-
-// 앱인토스 SDK는 실제 환경에서 import
-// import { appLogin } from '@apps-in-toss/web-framework'
+import { colors, spacing, radius, font, shadows } from '@/styles/tokens'
 
 const LEVEL_LABELS: Record<string, string> = {
-  beginner: '초급 (Beginner)',
-  intermediate: '중급 (Intermediate)',
-  advanced: '고급 (Advanced)',
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
 }
+
+const FREE_DAILY_LIMIT = 3
 
 export default function HomePage() {
   const { user, isLoggedIn, isNewUser } = useAuthStore()
   const [todayWords, setTodayWords] = useState<VocabWord[]>([])
   const [isLoadingWords, setIsLoadingWords] = useState(false)
+  const [todaySessionCount, setTodaySessionCount] = useState(0)
 
   useEffect(() => {
     if (isLoggedIn && !isNewUser) {
       loadTodayWords()
+      loadTodaySessionCount()
     }
   }, [isLoggedIn, isNewUser])
 
   const loadTodayWords = async () => {
     setIsLoadingWords(true)
     try {
-      const words = await vocabService.getRandomWords(3)
+      const words = await vocabService.getTodayWords(3)
       setTodayWords(words)
     } catch {
-      // 에러 처리
+      // silently fail
     } finally {
       setIsLoadingWords(false)
     }
   }
 
-  const handleLogin = async () => {
+  const loadTodaySessionCount = async () => {
     try {
-      // 실제 앱인토스 환경:
-      // const { authorizationCode, referrer } = await appLogin()
-      // const result = await authService.login(authorizationCode, referrer)
-
-      // 개발 환경 placeholder
-      alert('토스 로그인은 앱인토스 환경에서만 동작합니다.')
+      const { data } = await api.get('/history/stats')
+      setTodaySessionCount(data.today_sessions ?? 0)
     } catch {
-      alert('로그인에 실패했습니다.')
+      // silently fail
     }
   }
 
+  const handleLogin = async () => {
+    try {
+      toast.info('토스 로그인은 앱인토스 환경에서만 동작합니다.')
+    } catch {
+      toast.error('로그인에 실패했습니다.')
+    }
+  }
+
+  const remaining = Math.max(0, FREE_DAILY_LIMIT - todaySessionCount)
+  const isLimitReached = !user?.is_premium && remaining <= 0
+
   const handleStartChat = () => {
     if (todayWords.length < 3) return
+    if (isLimitReached) {
+      toast.premium('오늘의 무료 학습을 모두 사용했어요. 내일 다시 만나요!')
+      return
+    }
     const wordIds = todayWords.map((w) => w.id).join(',')
-    // 앱인토스 file-based routing
     window.location.href = `/chat?words=${wordIds}`
   }
 
@@ -65,14 +79,16 @@ export default function HomePage() {
     window.location.href = `/speaking?words=${wordIds}`
   }
 
+  // Login screen
   if (!isLoggedIn) {
     return (
       <div style={styles.page}>
         <div style={styles.hero}>
-          <h1 style={styles.title}>토킹토킹</h1>
-          <p style={styles.subtitle}>AI와 대화하며 영어 단어를 익혀요</p>
+          <div style={styles.logoCircle}>T</div>
+          <h1 style={styles.heroTitle}>TokingToking</h1>
+          <p style={styles.heroSubtitle}>AI와 대화하며 영어 단어를 마스터하세요</p>
           <button onClick={handleLogin} style={styles.loginButton}>
-            토스로 시작하기
+            시작하기
           </button>
         </div>
       </div>
@@ -84,66 +100,116 @@ export default function HomePage() {
     return null
   }
 
+  const progressPercent = Math.min(
+    100,
+    (todaySessionCount / FREE_DAILY_LIMIT) * 100
+  )
+
   return (
     <div style={styles.page}>
-      {/* 사용자 정보 */}
-      <div style={styles.userCard}>
-        <div style={styles.greeting}>👋 안녕하세요!</div>
-        <div style={styles.levelBadge}>
-          현재 레벨: {LEVEL_LABELS[user?.level ?? 'beginner']}
-        </div>
-        {(user?.streak_days ?? 0) > 0 && (
-          <div style={styles.streak}>
-            🔥 {user?.streak_days}일 연속 학습 중!
+      {/* Header */}
+      <div style={styles.header}>
+        <div style={styles.headerLeft}>
+          <div style={styles.levelPill}>
+            {LEVEL_LABELS[user?.level ?? 'beginner']}
           </div>
-        )}
+        </div>
+        <div style={styles.headerRight}>
+          {(user?.streak_days ?? 0) > 0 && (
+            <div style={styles.streakBadge}>
+              <span style={styles.streakFire}>&#9632;</span>
+              <span style={styles.streakCount}>{user?.streak_days}</span>
+            </div>
+          )}
+          <button
+            onClick={() => (window.location.href = '/mypage')}
+            style={styles.profileBtn}
+          >
+            MY
+          </button>
+        </div>
       </div>
 
-      {/* 오늘의 단어 */}
+      {/* Daily Progress */}
+      <div style={styles.progressSection}>
+        <div style={styles.progressHeader}>
+          <span style={styles.progressLabel}>오늘의 학습</span>
+          <span style={styles.progressCount}>
+            {todaySessionCount} / {FREE_DAILY_LIMIT}
+          </span>
+        </div>
+        <div style={styles.progressTrack}>
+          <div
+            style={{
+              ...styles.progressFill,
+              width: `${progressPercent}%`,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Today's Words */}
       <div style={styles.section}>
         <div style={styles.sectionTitle}>오늘의 단어</div>
         {isLoadingWords ? (
-          <div style={styles.loading}>단어를 불러오는 중...</div>
+          <div style={styles.loadingCards}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={styles.skeletonCard} />
+            ))}
+          </div>
         ) : (
           <div style={styles.wordCards}>
-            {todayWords.map((word) => (
-              <div key={word.id} style={styles.wordCard}>
-                <div style={styles.word}>{word.word}</div>
-                <div style={styles.pos}>{word.pos}</div>
-                <div style={styles.definition}>{word.definition_ko}</div>
+            {todayWords.map((word, idx) => (
+              <div
+                key={word.id}
+                style={{
+                  ...styles.wordCard,
+                  animationDelay: `${idx * 0.1}s`,
+                }}
+              >
+                <div style={styles.wordText}>{word.word}</div>
+                <div style={styles.wordPos}>{word.pos}</div>
+                <div style={styles.wordDef}>{word.definition_ko}</div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* 학습 시작 버튼 */}
+      {/* Actions */}
       <div style={styles.actions}>
         <button
           onClick={handleStartChat}
           disabled={todayWords.length < 3}
-          style={styles.chatButton}
+          style={{
+            ...styles.chatBtn,
+            opacity: isLimitReached ? 0.4 : 1,
+          }}
         >
-          💬 채팅으로 학습하기
-          <span style={styles.freeLabel}>(무료)</span>
+          <span style={styles.btnLabel}>채팅으로 학습하기</span>
+          {!user?.is_premium && (
+            <span style={styles.btnSub}>
+              {isLimitReached ? '오늘 학습 완료' : `오늘 ${remaining}회 남음`}
+            </span>
+          )}
         </button>
 
         <button
           onClick={handleStartSpeaking}
           disabled={todayWords.length < 3}
-          style={styles.speakingButton}
+          style={styles.speakBtn}
         >
-          🎤 스피킹으로 학습하기
-          <span style={styles.premiumLabel}>
-            {user?.is_premium ? '(Premium)' : '🔒'}
-          </span>
+          <span>스피킹으로 학습하기</span>
+          {!user?.is_premium && (
+            <span style={styles.premiumTag}>PRO</span>
+          )}
         </button>
 
         <button
-          onClick={() => (window.location.href = '/mypage')}
-          style={styles.historyButton}
+          onClick={() => (window.location.href = '/word-history')}
+          style={styles.historyBtn}
         >
-          📊 학습 기록 보기
+          단어 학습 기록
         </button>
       </div>
     </div>
@@ -153,157 +219,262 @@ export default function HomePage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    backgroundColor: '#FFFFFF',
-    paddingBottom: '32px',
+    backgroundColor: colors.white,
+    paddingBottom: `${spacing.xxxl}px`,
   },
+  // Hero (login)
   hero: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: '80vh',
-    padding: '0 24px',
-    textAlign: 'center' as const,
+    minHeight: '100vh',
+    padding: `0 ${spacing.xxl}px`,
+    textAlign: 'center',
+    background: `linear-gradient(180deg, ${colors.greenBg} 0%, ${colors.white} 60%)`,
   },
-  title: {
-    fontSize: '32px',
+  logoCircle: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '50%',
+    backgroundColor: colors.green,
+    color: colors.white,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '36px',
     fontWeight: 800,
-    color: '#333D4B',
-    marginBottom: '8px',
+    marginBottom: `${spacing.xl}px`,
+    boxShadow: shadows.button,
   },
-  subtitle: {
-    fontSize: '16px',
-    color: '#6B7684',
-    marginBottom: '32px',
+  heroTitle: {
+    ...font.h1,
+    fontSize: '28px',
+    color: colors.text,
+    marginBottom: `${spacing.sm}px`,
+  },
+  heroSubtitle: {
+    ...font.body,
+    color: colors.textSecondary,
+    marginBottom: `${spacing.xxxl}px`,
   },
   loginButton: {
     width: '100%',
     maxWidth: '320px',
-    height: '52px',
-    borderRadius: '12px',
+    height: '56px',
+    borderRadius: `${radius.lg}px`,
     border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '17px',
-    fontWeight: 700,
+    backgroundColor: colors.green,
+    color: colors.textOnPrimary,
+    ...font.h3,
     cursor: 'pointer',
-  },
-  userCard: {
-    margin: '16px',
-    padding: '20px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '16px',
-  },
-  greeting: {
-    fontSize: '20px',
-    fontWeight: 700,
-    marginBottom: '8px',
-  },
-  levelBadge: {
-    fontSize: '14px',
-    color: '#3182F6',
-    fontWeight: 600,
+    boxShadow: shadows.button,
     marginBottom: '4px',
   },
-  streak: {
-    fontSize: '14px',
-    color: '#E65100',
-    fontWeight: 600,
+  // Header
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    borderBottom: `2px solid ${colors.border}`,
   },
+  headerLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: `${spacing.sm}px`,
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: `${spacing.md}px`,
+  },
+  levelPill: {
+    padding: `${spacing.xs}px ${spacing.md}px`,
+    borderRadius: `${radius.full}px`,
+    backgroundColor: colors.blueLight,
+    color: colors.blueDark,
+    ...font.caption,
+    fontWeight: 700,
+  },
+  streakBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: `${spacing.xs}px ${spacing.sm}px`,
+    borderRadius: `${radius.full}px`,
+    backgroundColor: colors.orangeLight,
+    animation: 'streakGlow 2s ease-in-out infinite',
+  },
+  streakFire: {
+    color: colors.orange,
+    fontSize: '14px',
+  },
+  streakCount: {
+    ...font.caption,
+    fontWeight: 800,
+    color: colors.orange,
+  },
+  profileBtn: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    border: `2px solid ${colors.border}`,
+    backgroundColor: colors.bg,
+    color: colors.textSecondary,
+    fontSize: '12px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Progress
+  progressSection: {
+    padding: `${spacing.lg}px ${spacing.lg}px ${spacing.sm}px`,
+  },
+  progressHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: `${spacing.sm}px`,
+  },
+  progressLabel: {
+    ...font.caption,
+    color: colors.textSecondary,
+  },
+  progressCount: {
+    ...font.caption,
+    fontWeight: 700,
+    color: colors.text,
+  },
+  progressTrack: {
+    height: '12px',
+    backgroundColor: colors.surface,
+    borderRadius: `${radius.full}px`,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.green,
+    borderRadius: `${radius.full}px`,
+    transition: 'width 0.6s ease',
+    animation: 'progressFill 0.8s ease-out',
+  },
+  // Section
   section: {
-    margin: '24px 16px',
+    padding: `${spacing.xl}px ${spacing.lg}px`,
   },
   sectionTitle: {
-    fontSize: '18px',
-    fontWeight: 700,
-    marginBottom: '12px',
-    color: '#333D4B',
+    ...font.h3,
+    color: colors.text,
+    marginBottom: `${spacing.md}px`,
   },
-  loading: {
-    textAlign: 'center' as const,
-    color: '#6B7684',
-    padding: '20px',
+  loadingCards: {
+    display: 'flex',
+    gap: `${spacing.sm}px`,
+  },
+  skeletonCard: {
+    flex: 1,
+    height: '100px',
+    borderRadius: `${radius.lg}px`,
+    backgroundColor: colors.surface,
+    animation: 'pulse 1.5s ease-in-out infinite',
   },
   wordCards: {
     display: 'flex',
-    gap: '8px',
+    gap: `${spacing.sm}px`,
   },
   wordCard: {
     flex: 1,
-    padding: '16px 12px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '12px',
-    textAlign: 'center' as const,
+    padding: `${spacing.lg}px ${spacing.md}px`,
+    backgroundColor: colors.white,
+    borderRadius: `${radius.lg}px`,
+    textAlign: 'center',
+    border: `2px solid ${colors.border}`,
+    boxShadow: shadows.card,
+    animation: 'slideUp 0.4s ease-out both',
   },
-  word: {
-    fontSize: '16px',
+  wordText: {
+    ...font.bodyBold,
     fontWeight: 700,
-    color: '#333D4B',
-    marginBottom: '4px',
+    color: colors.text,
+    marginBottom: '2px',
   },
-  pos: {
-    fontSize: '11px',
-    color: '#8B95A1',
-    marginBottom: '4px',
+  wordPos: {
+    ...font.small,
+    color: colors.textTertiary,
+    marginBottom: `${spacing.xs}px`,
   },
-  definition: {
-    fontSize: '13px',
-    color: '#6B7684',
+  wordDef: {
+    ...font.caption,
+    color: colors.textSecondary,
   },
+  // Actions
   actions: {
-    padding: '0 16px',
+    padding: `0 ${spacing.lg}px`,
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: `${spacing.md}px`,
   },
-  chatButton: {
+  chatBtn: {
     width: '100%',
-    height: '56px',
-    borderRadius: '12px',
+    height: '58px',
+    borderRadius: `${radius.lg}px`,
     border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '17px',
-    fontWeight: 700,
+    backgroundColor: colors.green,
+    color: colors.textOnPrimary,
+    ...font.h3,
     cursor: 'pointer',
+    boxShadow: shadows.button,
+    marginBottom: '4px',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: '2px',
+    padding: `${spacing.sm}px 0`,
   },
-  freeLabel: {
-    fontSize: '13px',
-    fontWeight: 400,
-    opacity: 0.8,
+  btnLabel: {
+    ...font.h3,
+    color: 'inherit',
   },
-  speakingButton: {
+  btnSub: {
+    ...font.small,
+    opacity: 0.85,
+    color: 'inherit',
+  },
+  speakBtn: {
     width: '100%',
-    height: '56px',
-    borderRadius: '12px',
-    border: '2px solid #3182F6',
-    backgroundColor: '#FFFFFF',
-    color: '#3182F6',
-    fontSize: '17px',
-    fontWeight: 700,
+    height: '52px',
+    borderRadius: `${radius.lg}px`,
+    border: `2px solid ${colors.border}`,
+    backgroundColor: colors.white,
+    color: colors.text,
+    ...font.bodyBold,
     cursor: 'pointer',
+    boxShadow: shadows.card,
+    marginBottom: '2px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: `${spacing.sm}px`,
   },
-  premiumLabel: {
-    fontSize: '13px',
-    fontWeight: 400,
+  premiumTag: {
+    ...font.small,
+    fontWeight: 700,
+    color: colors.purple,
+    backgroundColor: colors.purpleLight,
+    padding: `2px ${spacing.sm}px`,
+    borderRadius: `${radius.sm}px`,
   },
-  historyButton: {
+  historyBtn: {
     width: '100%',
     height: '48px',
-    borderRadius: '12px',
+    borderRadius: `${radius.lg}px`,
     border: 'none',
-    backgroundColor: '#F5F6F8',
-    color: '#6B7684',
-    fontSize: '15px',
-    fontWeight: 600,
+    backgroundColor: colors.bg,
+    color: colors.textSecondary,
+    ...font.bodyBold,
     cursor: 'pointer',
   },
 }

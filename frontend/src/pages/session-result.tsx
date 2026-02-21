@@ -1,6 +1,7 @@
 import React from 'react'
 import { useSessionStore } from '@/store/sessionStore'
 import { useAuthStore } from '@/store/authStore'
+import { colors, spacing, radius, font, shadows, primaryBtnStyle, secondaryBtnStyle } from '@/styles/tokens'
 
 export default function SessionResultPage() {
   const { summary } = useSessionStore()
@@ -20,65 +21,70 @@ export default function SessionResultPage() {
 
   return (
     <div style={styles.page}>
+      {/* Header */}
       <div style={styles.header}>
-        <span style={styles.headerTitle}>학습 완료!</span>
+        <span style={styles.headerTitle}>학습 완료</span>
       </div>
 
       <div style={styles.content}>
-        <div style={styles.celebrationEmoji}>🎉</div>
-        <div style={styles.title}>수고했어요!</div>
+        {/* Celebration */}
+        <div style={styles.celebration}>
+          <div style={styles.celebrationCircle}>
+            <span style={styles.checkMark}>&#10003;</span>
+          </div>
+          <div style={styles.celebrationTitle}>수고했어요!</div>
+        </div>
 
-        {/* 학습한 단어 */}
+        {/* Word Results */}
         <div style={styles.section}>
-          <div style={styles.sectionTitle}>오늘 학습한 단어</div>
+          <div style={styles.sectionTitle}>학습한 단어</div>
           {summary?.word_usage_details.map((detail, idx) => (
             <div key={idx} style={styles.wordResult}>
-              <div style={styles.wordResultHeader}>
-                ✅ {detail.word}
+              <div style={styles.wordHeader}>
+                <span style={styles.wordCheckCircle}>&#10003;</span>
+                <span style={styles.wordName}>{detail.word}</span>
               </div>
-              <div style={styles.wordResultSentence}>
-                "{detail.used_in}"
-              </div>
-              <div style={styles.wordResultFeedback}>
-                {detail.feedback}
-              </div>
+              <div style={styles.wordSentence}>"{detail.used_in}"</div>
+              <div style={styles.wordFeedback}>{detail.feedback}</div>
             </div>
           ))}
         </div>
 
-        {/* 학습 통계 */}
+        {/* Stats */}
         {summary && (
           <div style={styles.statsCard}>
-            <div style={styles.sectionTitle}>📊 학습 통계</div>
-            <div style={styles.statRow}>
-              <span>소요 시간</span>
-              <span style={styles.statValue}>
-                {formatDuration(summary.duration_seconds)}
-              </span>
-            </div>
-            <div style={styles.statRow}>
-              <span>메시지 수</span>
-              <span style={styles.statValue}>{summary.message_count}개</span>
-            </div>
-            {(user?.streak_days ?? 0) > 0 && (
-              <div style={styles.statRow}>
-                <span>연속 학습</span>
-                <span style={styles.statValue}>
-                  {user?.streak_days}일째 🔥
-                </span>
+            <div style={styles.sectionTitle}>학습 통계</div>
+            <div style={styles.statsGrid}>
+              <div style={styles.statItem}>
+                <div style={styles.statNumber}>
+                  {formatDuration(summary.duration_seconds)}
+                </div>
+                <div style={styles.statLabel}>소요 시간</div>
               </div>
-            )}
+              <div style={styles.statItem}>
+                <div style={styles.statNumber}>{summary.message_count}</div>
+                <div style={styles.statLabel}>메시지</div>
+              </div>
+              {(user?.streak_days ?? 0) > 0 && (
+                <div style={styles.statItem}>
+                  <div style={{ ...styles.statNumber, color: colors.orange }}>
+                    {user?.streak_days}일
+                  </div>
+                  <div style={styles.statLabel}>연속 학습</div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* 액션 버튼 */}
+        {/* Actions */}
         <div style={styles.actions}>
-          <button onClick={handleNewSession} style={styles.primaryButton}>
+          <button onClick={handleNewSession} style={primaryBtnStyle}>
             한 번 더 학습하기
           </button>
           <button
             onClick={() => (window.location.href = '/')}
-            style={styles.secondaryButton}
+            style={secondaryBtnStyle}
           >
             홈으로 돌아가기
           </button>
@@ -91,104 +97,133 @@ export default function SessionResultPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   header: {
-    padding: '12px 16px',
-    borderBottom: '1px solid #E5E8EB',
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    borderBottom: `2px solid ${colors.border}`,
   },
   headerTitle: {
-    fontSize: '17px',
-    fontWeight: 700,
+    ...font.h3,
+    color: colors.text,
   },
   content: {
-    padding: '24px 16px',
+    padding: `${spacing.xxl}px ${spacing.lg}px`,
+    animation: 'fadeIn 0.5s ease-out',
   },
-  celebrationEmoji: {
-    fontSize: '48px',
-    textAlign: 'center' as const,
-    marginBottom: '8px',
+  celebration: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: `${spacing.xxl}px`,
+    animation: 'scaleIn 0.5s ease-out',
   },
-  title: {
-    fontSize: '24px',
-    fontWeight: 800,
-    textAlign: 'center' as const,
-    marginBottom: '24px',
-    color: '#333D4B',
+  celebrationCircle: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '50%',
+    backgroundColor: colors.green,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: `${spacing.lg}px`,
+    boxShadow: shadows.button,
+  },
+  checkMark: {
+    fontSize: '36px',
+    color: colors.white,
+    fontWeight: 700,
+  },
+  celebrationTitle: {
+    ...font.h1,
+    color: colors.text,
   },
   section: {
-    marginBottom: '24px',
+    marginBottom: `${spacing.xxl}px`,
   },
   sectionTitle: {
-    fontSize: '16px',
-    fontWeight: 700,
-    marginBottom: '12px',
-    color: '#333D4B',
+    ...font.bodyBold,
+    color: colors.text,
+    marginBottom: `${spacing.md}px`,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+    fontSize: '13px',
   },
   wordResult: {
-    padding: '14px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '12px',
-    marginBottom: '8px',
+    padding: `14px`,
+    backgroundColor: colors.white,
+    borderRadius: `${radius.md}px`,
+    marginBottom: `${spacing.sm}px`,
+    border: `2px solid ${colors.border}`,
+    boxShadow: shadows.card,
   },
-  wordResultHeader: {
-    fontSize: '16px',
-    fontWeight: 700,
-    color: '#2E7D32',
-    marginBottom: '6px',
+  wordHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: `${spacing.sm}px`,
+    marginBottom: `${spacing.sm}px`,
   },
-  wordResultSentence: {
+  wordCheckCircle: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    backgroundColor: colors.green,
+    color: colors.white,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     fontSize: '14px',
-    color: '#333D4B',
+    fontWeight: 700,
+    flexShrink: 0,
+  },
+  wordName: {
+    ...font.bodyBold,
+    fontWeight: 700,
+    color: colors.text,
+  },
+  wordSentence: {
+    ...font.caption,
+    color: colors.text,
     fontStyle: 'italic',
     marginBottom: '4px',
+    paddingLeft: `${spacing.xxxl}px`,
   },
-  wordResultFeedback: {
-    fontSize: '13px',
-    color: '#6B7684',
+  wordFeedback: {
+    ...font.caption,
+    color: colors.textSecondary,
+    paddingLeft: `${spacing.xxxl}px`,
   },
   statsCard: {
-    padding: '16px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '16px',
-    marginBottom: '24px',
+    padding: `${spacing.lg}px`,
+    backgroundColor: colors.bg,
+    borderRadius: `${radius.lg}px`,
+    marginBottom: `${spacing.xxl}px`,
   },
-  statRow: {
+  statsGrid: {
     display: 'flex',
-    justifyContent: 'space-between',
-    padding: '8px 0',
-    fontSize: '14px',
-    color: '#6B7684',
+    gap: `${spacing.sm}px`,
   },
-  statValue: {
-    fontWeight: 700,
-    color: '#333D4B',
+  statItem: {
+    flex: 1,
+    textAlign: 'center',
+    padding: `${spacing.md}px`,
+    backgroundColor: colors.white,
+    borderRadius: `${radius.md}px`,
+    border: `2px solid ${colors.border}`,
+    boxShadow: shadows.card,
+  },
+  statNumber: {
+    ...font.h2,
+    color: colors.text,
+    marginBottom: '2px',
+  },
+  statLabel: {
+    ...font.small,
+    color: colors.textTertiary,
   },
   actions: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
-  },
-  primaryButton: {
-    width: '100%',
-    height: '52px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '17px',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  secondaryButton: {
-    width: '100%',
-    height: '48px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#F5F6F8',
-    color: '#6B7684',
-    fontSize: '15px',
-    fontWeight: 600,
-    cursor: 'pointer',
+    gap: `${spacing.md}px`,
   },
 }

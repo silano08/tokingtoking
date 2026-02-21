@@ -7,6 +7,8 @@ import { chatService } from '@/services/chatService'
 import { transcribeAudio } from '@/services/speechService'
 import type { ChatMessage } from '@/types/chat'
 import { speakText } from '@/utils/speech'
+import { toast } from '@/store/toastStore'
+import { colors, spacing, radius, font, headerStyle, backBtnStyle, headerTitleStyle } from '@/styles/tokens'
 
 export default function SpeakingPage() {
   const {
@@ -44,36 +46,28 @@ export default function SpeakingPage() {
       if (wordIds.length < 3) return
 
       const session = await chatService.createSession('speaking', wordIds)
-      startSession(
-        session.session_id,
-        'speaking',
-        session.target_words,
-        session.initial_message
-      )
+      startSession(session.session_id, 'speaking', session.target_words, session.initial_message)
 
-      // AI 첫 메시지 TTS 재생
       if (session.initial_message.content) {
         setLastAiMessage(session.initial_message.content)
         speakText(session.initial_message.content)
       }
     } catch {
-      alert('세션 시작에 실패했습니다.')
+      toast.error('세션 시작에 실패했습니다.')
     } finally {
       setLoading(false)
     }
   }
 
-  // Groq Whisper 기반 음성 처리 (서버 사이드)
   const handleAudioResult = async (audioBlob: Blob) => {
     if (!sessionId || isLoading) return
 
     setLoading(true)
-    addMessage({ role: 'user', content: '🎤 음성 분석 중...' })
+    addMessage({ role: 'user', content: '음성 분석 중...' })
 
     try {
       const response = await transcribeAudio(audioBlob, sessionId)
 
-      // 사용자 메시지를 실제 전사 텍스트로 교체
       const transcribedText = response.transcription.processed || response.transcription.raw
       useSessionStore.setState((state) => {
         const msgs = [...state.messages]
@@ -95,7 +89,6 @@ export default function SpeakingPage() {
       addMessage(aiMessage)
       updateStatus(response.session_status)
 
-      // AI 응답 TTS 재생
       if (response.message.content) {
         setLastAiMessage(response.message.content)
         speakText(response.message.content)
@@ -131,7 +124,6 @@ export default function SpeakingPage() {
     }
   }
 
-  // 브라우저 Web Speech API 폴백
   const handleVoiceResult = async (transcribedText: string) => {
     if (!sessionId || isLoading) return
 
@@ -139,10 +131,7 @@ export default function SpeakingPage() {
     setLoading(true)
 
     try {
-      const response = await chatService.sendSpeakingMessage(
-        sessionId,
-        transcribedText
-      )
+      const response = await chatService.sendSpeakingMessage(sessionId, transcribedText)
       addMessage(response.message)
       updateStatus(response.session_status)
 
@@ -172,44 +161,45 @@ export default function SpeakingPage() {
   }
 
   const handleReplay = () => {
-    if (lastAiMessage) {
-      speakText(lastAiMessage)
-    }
+    if (lastAiMessage) speakText(lastAiMessage)
   }
 
   return (
     <div style={styles.page}>
-      {/* 헤더 */}
-      <div style={styles.header}>
-        <button onClick={() => window.history.back()} style={styles.backButton}>
-          ←
+      {/* Header */}
+      <div style={headerStyle}>
+        <button onClick={() => window.history.back()} style={backBtnStyle}>
+          &#8592;
         </button>
-        <span style={styles.headerTitle}>스피킹 학습</span>
-        <button onClick={handleReplay} style={styles.replayButton}>
-          🔊
+        <span style={headerTitleStyle}>스피킹 학습</span>
+        <button onClick={handleReplay} style={styles.replayBtn}>
+          &#9654;
         </button>
       </div>
 
-      {/* 단어 상태 바 */}
+      {/* Word Status */}
       {targetWords.length > 0 && sessionStatus && (
-        <WordStatusBar
-          targetWords={targetWords}
-          wordsUsed={sessionStatus.words_used}
-        />
+        <WordStatusBar targetWords={targetWords} wordsUsed={sessionStatus.words_used} />
       )}
 
-      {/* 채팅 영역 */}
+      {/* Chat Area */}
       <div style={styles.chatArea}>
         {messages.map((msg, idx) => (
           <ChatBubble key={idx} message={msg} showFeedback={true} />
         ))}
         {isLoading && (
-          <div style={styles.typing}>🤖 분석 중...</div>
+          <div style={styles.typing}>
+            <div style={styles.typingBubble}>
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+            </div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 음성 입력 영역 */}
+      {/* Voice Input */}
       <div style={styles.voiceArea}>
         <VoiceRecorder
           onResult={handleVoiceResult}
@@ -217,9 +207,7 @@ export default function SpeakingPage() {
           disabled={isLoading || sessionStatus?.is_completed}
           mode="server"
         />
-        <div style={styles.voiceHint}>
-          Groq Whisper로 빠른 음성 인식
-        </div>
+        <div style={styles.voiceHint}>Groq Whisper 음성 인식</div>
       </div>
     </div>
   )
@@ -230,54 +218,44 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px 16px',
-    borderBottom: '1px solid #E5E8EB',
-  },
-  backButton: {
+  replayBtn: {
     border: 'none',
     background: 'none',
-    fontSize: '20px',
+    fontSize: '16px',
     cursor: 'pointer',
-    padding: '4px 8px',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: '17px',
-    fontWeight: 700,
-    marginLeft: '8px',
-  },
-  replayButton: {
-    border: 'none',
-    background: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    padding: '4px 8px',
+    padding: `${spacing.xs}px ${spacing.sm}px`,
+    color: colors.blue,
+    marginLeft: 'auto',
   },
   chatArea: {
     flex: 1,
-    overflowY: 'auto' as const,
-    padding: '16px 0',
+    overflowY: 'auto',
+    padding: `${spacing.lg}px 0`,
   },
   typing: {
-    padding: '0 16px',
-    fontSize: '14px',
-    color: '#8B95A1',
-    marginBottom: '12px',
+    padding: `0 ${spacing.lg}px`,
+    marginBottom: `${spacing.md}px`,
+  },
+  typingBubble: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: `${spacing.md}px 14px`,
+    backgroundColor: colors.bg,
+    borderRadius: `${radius.lg}px`,
+    border: `1px solid ${colors.border}`,
   },
   voiceArea: {
-    padding: '20px 16px',
-    borderTop: '1px solid #E5E8EB',
-    backgroundColor: '#F5F6F8',
+    padding: `${spacing.xl}px ${spacing.lg}px`,
+    borderTop: `2px solid ${colors.border}`,
+    backgroundColor: colors.bg,
   },
   voiceHint: {
-    textAlign: 'center' as const,
-    fontSize: '11px',
-    color: '#8B95A1',
-    marginTop: '8px',
+    textAlign: 'center',
+    ...font.small,
+    color: colors.textTertiary,
+    marginTop: `${spacing.sm}px`,
   },
 }

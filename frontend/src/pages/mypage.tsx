@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import api from '@/services/api'
+import { colors, spacing, radius, font, shadows, headerStyle, backBtnStyle, headerTitleStyle, primaryBtnStyle } from '@/styles/tokens'
 
 const LEVEL_LABELS: Record<string, string> = {
-  beginner: '초급',
-  intermediate: '중급',
-  advanced: '고급',
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
 }
 
 interface Stats {
@@ -29,35 +30,43 @@ export default function MyPage() {
       const { data } = await api.get('/history/stats')
       setStats(data)
     } catch {
-      // 에러 무시
+      // silently fail
     }
   }
 
   return (
     <div style={styles.page}>
-      <div style={styles.header}>
-        <button onClick={() => window.history.back()} style={styles.backButton}>
-          ←
+      {/* Header */}
+      <div style={headerStyle}>
+        <button onClick={() => window.history.back()} style={backBtnStyle}>
+          &#8592;
         </button>
-        <span style={styles.headerTitle}>학습 기록</span>
+        <span style={headerTitleStyle}>마이페이지</span>
       </div>
 
       <div style={styles.content}>
-        {/* 레벨 카드 */}
+        {/* Level Card */}
         <div style={styles.levelCard}>
-          <div style={styles.levelLabel}>현재 레벨</div>
-          <div style={styles.levelValue}>
-            {LEVEL_LABELS[stats?.level ?? user?.level ?? 'beginner']}
+          <div style={styles.levelCircle}>
+            <span style={styles.levelIcon}>
+              {(stats?.level ?? user?.level ?? 'beginner').charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div style={styles.levelInfo}>
+            <div style={styles.levelLabel}>현재 레벨</div>
+            <div style={styles.levelValue}>
+              {LEVEL_LABELS[stats?.level ?? user?.level ?? 'beginner']}
+            </div>
           </div>
           <button
             onClick={() => (window.location.href = '/level-test')}
-            style={styles.retestButton}
+            style={styles.retestBtn}
           >
-            레벨 재측정
+            재측정
           </button>
         </div>
 
-        {/* 통계 */}
+        {/* Stats */}
         {stats && (
           <div style={styles.statsGrid}>
             <div style={styles.statCard}>
@@ -68,31 +77,50 @@ export default function MyPage() {
               <div style={styles.statValue}>{stats.completed_sessions}</div>
               <div style={styles.statLabel}>완료</div>
             </div>
-            <div style={styles.statCard}>
-              <div style={styles.statValue}>
-                {stats.streak_days > 0 ? `${stats.streak_days}일 🔥` : '0일'}
+            <div style={{
+              ...styles.statCard,
+              ...(stats.streak_days > 0 ? styles.streakCard : {}),
+            }}>
+              <div style={{
+                ...styles.statValue,
+                color: stats.streak_days > 0 ? colors.orange : colors.text,
+              }}>
+                {stats.streak_days}일
               </div>
               <div style={styles.statLabel}>연속 학습</div>
             </div>
           </div>
         )}
 
-        {/* 구독 상태 */}
+        {/* Word History Link */}
+        <div style={styles.section}>
+          <button
+            onClick={() => (window.location.href = '/word-history')}
+            style={styles.historyLink}
+          >
+            <span style={styles.historyLinkText}>단어 학습 기록</span>
+            <span style={styles.historyArrow}>&#8250;</span>
+          </button>
+        </div>
+
+        {/* Subscription */}
         <div style={styles.section}>
           <div style={styles.sectionTitle}>구독 상태</div>
-          <div style={styles.subscriptionCard}>
+          <div style={styles.subCard}>
             {user?.is_premium ? (
               <>
-                <div style={styles.premiumBadge}>Premium ✅</div>
-                <div style={styles.premiumDesc}>스피킹 학습 이용 가능</div>
+                <div style={styles.proBadge}>PRO</div>
+                <div style={styles.subTitle}>Premium 구독 중</div>
+                <div style={styles.subDesc}>스피킹 학습 이용 가능</div>
               </>
             ) : (
               <>
-                <div style={styles.freeBadge}>무료 플랜</div>
-                <div style={styles.premiumDesc}>채팅 학습만 이용 가능</div>
+                <div style={styles.freeBadge}>FREE</div>
+                <div style={styles.subTitle}>무료 플랜</div>
+                <div style={styles.subDesc}>채팅 학습만 이용 가능</div>
                 <button
                   onClick={() => (window.location.href = '/subscribe')}
-                  style={styles.upgradeButton}
+                  style={{ ...primaryBtnStyle, marginTop: `${spacing.md}px` }}
                 >
                   Premium 시작하기
                 </button>
@@ -108,118 +136,157 @@ export default function MyPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px 16px',
-    borderBottom: '1px solid #E5E8EB',
-  },
-  backButton: {
-    border: 'none',
-    background: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    padding: '4px 8px',
-  },
-  headerTitle: {
-    fontSize: '17px',
-    fontWeight: 700,
-    marginLeft: '8px',
+    backgroundColor: colors.white,
   },
   content: {
-    padding: '16px',
+    padding: `${spacing.lg}px`,
   },
+  // Level Card
   levelCard: {
-    padding: '24px',
-    backgroundColor: '#3182F6',
-    borderRadius: '16px',
-    color: '#FFFFFF',
-    textAlign: 'center' as const,
-    marginBottom: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: `${spacing.md}px`,
+    padding: `${spacing.xl}px`,
+    backgroundColor: colors.blueLight,
+    borderRadius: `${radius.lg}px`,
+    marginBottom: `${spacing.lg}px`,
+    border: `2px solid ${colors.blue}`,
+    boxShadow: `0 4px 0 ${colors.blueDark}`,
+  },
+  levelCircle: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    backgroundColor: colors.blue,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  levelIcon: {
+    fontSize: '22px',
+    fontWeight: 800,
+    color: colors.white,
+  },
+  levelInfo: {
+    flex: 1,
   },
   levelLabel: {
-    fontSize: '13px',
-    opacity: 0.8,
-    marginBottom: '4px',
+    ...font.small,
+    color: colors.blueDark,
+    marginBottom: '2px',
   },
   levelValue: {
-    fontSize: '28px',
-    fontWeight: 800,
-    marginBottom: '12px',
+    ...font.h2,
+    color: colors.text,
   },
-  retestButton: {
-    padding: '8px 20px',
-    borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.5)',
-    backgroundColor: 'transparent',
-    color: '#FFFFFF',
-    fontSize: '13px',
-    fontWeight: 600,
+  retestBtn: {
+    padding: `${spacing.sm}px ${spacing.lg}px`,
+    borderRadius: `${radius.full}px`,
+    border: `2px solid ${colors.blueDark}`,
+    backgroundColor: colors.white,
+    color: colors.blueDark,
+    ...font.caption,
+    fontWeight: 700,
     cursor: 'pointer',
   },
+  // Stats
   statsGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr',
-    gap: '8px',
-    marginBottom: '24px',
+    gap: `${spacing.sm}px`,
+    marginBottom: `${spacing.xxl}px`,
   },
   statCard: {
-    padding: '16px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '12px',
-    textAlign: 'center' as const,
+    padding: `${spacing.lg}px ${spacing.sm}px`,
+    backgroundColor: colors.white,
+    borderRadius: `${radius.md}px`,
+    textAlign: 'center',
+    border: `2px solid ${colors.border}`,
+    boxShadow: shadows.card,
+  },
+  streakCard: {
+    borderColor: colors.orange,
+    backgroundColor: colors.orangeLight,
   },
   statValue: {
-    fontSize: '20px',
-    fontWeight: 800,
-    color: '#333D4B',
-    marginBottom: '4px',
+    ...font.h2,
+    color: colors.text,
+    marginBottom: '2px',
   },
   statLabel: {
-    fontSize: '12px',
-    color: '#8B95A1',
+    ...font.small,
+    color: colors.textTertiary,
   },
+  // Section
   section: {
-    marginBottom: '24px',
+    marginBottom: `${spacing.xxl}px`,
   },
   sectionTitle: {
-    fontSize: '16px',
+    ...font.caption,
     fontWeight: 700,
-    marginBottom: '12px',
+    color: colors.textSecondary,
+    marginBottom: `${spacing.md}px`,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
   },
-  subscriptionCard: {
-    padding: '20px',
-    backgroundColor: '#F5F6F8',
-    borderRadius: '16px',
+  // History link
+  historyLink: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: `${spacing.lg}px`,
+    borderRadius: `${radius.md}px`,
+    border: `2px solid ${colors.border}`,
+    backgroundColor: colors.white,
+    cursor: 'pointer',
+    boxShadow: shadows.card,
   },
-  premiumBadge: {
-    fontSize: '18px',
-    fontWeight: 700,
-    color: '#2E7D32',
-    marginBottom: '4px',
+  historyLinkText: {
+    ...font.bodyBold,
+    color: colors.text,
+  },
+  historyArrow: {
+    fontSize: '20px',
+    color: colors.textTertiary,
+  },
+  // Subscription
+  subCard: {
+    padding: `${spacing.xl}px`,
+    backgroundColor: colors.white,
+    borderRadius: `${radius.lg}px`,
+    border: `2px solid ${colors.border}`,
+    boxShadow: shadows.card,
+  },
+  proBadge: {
+    display: 'inline-block',
+    padding: `${spacing.xs}px ${spacing.md}px`,
+    backgroundColor: colors.green,
+    color: colors.white,
+    borderRadius: `${radius.sm}px`,
+    ...font.small,
+    fontWeight: 800,
+    marginBottom: `${spacing.sm}px`,
   },
   freeBadge: {
-    fontSize: '18px',
+    display: 'inline-block',
+    padding: `${spacing.xs}px ${spacing.md}px`,
+    backgroundColor: colors.surface,
+    color: colors.textSecondary,
+    borderRadius: `${radius.sm}px`,
+    ...font.small,
+    fontWeight: 800,
+    marginBottom: `${spacing.sm}px`,
+  },
+  subTitle: {
+    ...font.bodyBold,
     fontWeight: 700,
-    color: '#6B7684',
+    color: colors.text,
     marginBottom: '4px',
   },
-  premiumDesc: {
-    fontSize: '14px',
-    color: '#6B7684',
-    marginBottom: '12px',
-  },
-  upgradeButton: {
-    width: '100%',
-    height: '44px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#3182F6',
-    color: '#FFFFFF',
-    fontSize: '15px',
-    fontWeight: 700,
-    cursor: 'pointer',
+  subDesc: {
+    ...font.caption,
+    color: colors.textSecondary,
   },
 }

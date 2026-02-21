@@ -1,5 +1,6 @@
 import React from 'react'
 import type { TargetWord } from '@/types/chat'
+import { colors, spacing, radius, font } from '@/styles/tokens'
 
 interface WordStatusBarProps {
   targetWords: TargetWord[]
@@ -10,9 +11,15 @@ export const WordStatusBar: React.FC<WordStatusBarProps> = ({
   targetWords,
   wordsUsed,
 }) => {
+  const usedCount = Object.values(wordsUsed).filter(Boolean).length
+  const total = targetWords.length
+
   return (
     <div style={styles.container}>
-      <div style={styles.label}>오늘의 단어</div>
+      <div style={styles.headerRow}>
+        <span style={styles.label}>목표 단어</span>
+        <span style={styles.counter}>{usedCount} / {total}</span>
+      </div>
       <div style={styles.wordList}>
         {targetWords.map((word) => {
           const isUsed = wordsUsed[word.word] ?? false
@@ -20,11 +27,16 @@ export const WordStatusBar: React.FC<WordStatusBarProps> = ({
             <div
               key={word.id}
               style={{
-                ...styles.wordChip,
-                ...(isUsed ? styles.wordUsed : styles.wordPending),
+                ...styles.chip,
+                ...(isUsed ? styles.chipUsed : styles.chipPending),
               }}
             >
-              <span style={styles.checkMark}>{isUsed ? '✅' : '☐'}</span>
+              <span style={{
+                ...styles.checkIcon,
+                ...(isUsed ? styles.checkDone : styles.checkEmpty),
+              }}>
+                {isUsed ? '\u2713' : ''}
+              </span>
               <span style={styles.wordText}>{word.word}</span>
             </div>
           )
@@ -36,43 +48,73 @@ export const WordStatusBar: React.FC<WordStatusBarProps> = ({
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    padding: '12px 16px',
-    backgroundColor: '#F5F6F8',
-    borderBottom: '1px solid #E5E8EB',
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    backgroundColor: colors.white,
+    borderBottom: `2px solid ${colors.border}`,
+  },
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: `${spacing.sm}px`,
   },
   label: {
-    fontSize: '12px',
-    color: '#6B7684',
-    marginBottom: '8px',
+    ...font.small,
+    color: colors.textSecondary,
     fontWeight: 600,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+  },
+  counter: {
+    ...font.caption,
+    fontWeight: 700,
+    color: colors.green,
   },
   wordList: {
     display: 'flex',
-    gap: '8px',
+    gap: `${spacing.sm}px`,
     flexWrap: 'wrap',
   },
-  wordChip: {
+  chip: {
     display: 'flex',
     alignItems: 'center',
-    gap: '4px',
-    padding: '6px 12px',
-    borderRadius: '16px',
-    fontSize: '14px',
-    fontWeight: 500,
+    gap: `${spacing.xs}px`,
+    padding: `${spacing.sm}px ${spacing.md}px`,
+    borderRadius: `${radius.full}px`,
+    ...font.caption,
+    fontWeight: 600,
+    transition: 'all 0.3s ease',
   },
-  wordUsed: {
-    backgroundColor: '#E8F5E9',
-    color: '#2E7D32',
+  chipUsed: {
+    backgroundColor: colors.greenBg,
+    color: colors.greenDark,
+    border: `2px solid ${colors.green}`,
   },
-  wordPending: {
-    backgroundColor: '#FFFFFF',
-    color: '#333D4B',
-    border: '1px solid #E5E8EB',
+  chipPending: {
+    backgroundColor: colors.white,
+    color: colors.text,
+    border: `2px solid ${colors.border}`,
   },
-  checkMark: {
-    fontSize: '14px',
+  checkIcon: {
+    width: '18px',
+    height: '18px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '12px',
+    fontWeight: 700,
+  },
+  checkDone: {
+    backgroundColor: colors.green,
+    color: colors.white,
+  },
+  checkEmpty: {
+    border: `2px solid ${colors.border}`,
+    backgroundColor: colors.white,
   },
   wordText: {
-    fontSize: '14px',
+    ...font.caption,
+    fontWeight: 600,
   },
 }

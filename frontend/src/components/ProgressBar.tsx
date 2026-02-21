@@ -1,4 +1,5 @@
 import React from 'react'
+import { colors, spacing, radius, font } from '@/styles/tokens'
 
 interface ProgressBarProps {
   current: number
@@ -16,8 +17,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div style={styles.container}>
       {label && (
-        <div style={styles.label}>
-          {label} {current} / {total}
+        <div style={styles.header}>
+          <span style={styles.label}>{label}</span>
+          <span style={styles.counter}>{current} / {total}</span>
         </div>
       )}
       <div style={styles.track}>
@@ -28,36 +30,40 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           }}
         />
       </div>
-      <div style={styles.percentage}>{percentage}%</div>
     </div>
   )
 }
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    padding: '12px 16px',
+    padding: `${spacing.md}px ${spacing.lg}px`,
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: `${spacing.sm}px`,
   },
   label: {
-    fontSize: '13px',
-    color: '#6B7684',
-    marginBottom: '6px',
+    ...font.caption,
+    color: colors.textSecondary,
+  },
+  counter: {
+    ...font.caption,
+    fontWeight: 700,
+    color: colors.green,
   },
   track: {
-    height: '8px',
-    backgroundColor: '#E5E8EB',
-    borderRadius: '4px',
+    height: '12px',
+    backgroundColor: colors.surface,
+    borderRadius: `${radius.full}px`,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: '#3182F6',
-    borderRadius: '4px',
-    transition: 'width 0.3s ease',
-  },
-  percentage: {
-    fontSize: '12px',
-    color: '#6B7684',
-    textAlign: 'right' as const,
-    marginTop: '4px',
+    backgroundColor: colors.green,
+    borderRadius: `${radius.full}px`,
+    transition: 'width 0.4s ease',
+    animation: 'progressFill 0.6s ease-out',
   },
 }

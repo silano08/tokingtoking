@@ -36,4 +36,4 @@ RESPONSE FORMAT (respond ONLY with this JSON, no other text):
   "hint": null
 }}
 
-The "hint" field should be a SHORT suggestion in Korean (e.g., "이런 상황에서 '{word}' 를 써볼 수 있어요!") only if the user seems stuck after 3+ messages without using remaining words. Otherwise keep it null.
+The "hint" field should be a SHORT suggestion in Korean (e.g., "이런 상황에서 'budget' 를 써볼 수 있어요!") only if the user seems stuck after 3+ messages without using remaining words. Use the actual unused target word in the hint. Otherwise keep it null.

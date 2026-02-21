@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { vocabService } from '@/services/vocabService'
 import { toast } from '@/store/toastStore'
@@ -15,10 +15,35 @@ const LEVEL_LABELS: Record<string, string> = {
 const FREE_DAILY_LIMIT = 3
 
 export default function HomePage() {
-  const { user, isLoggedIn, isNewUser } = useAuthStore()
+  const { user, isLoggedIn, isNewUser, setUser } = useAuthStore()
   const [todayWords, setTodayWords] = useState<VocabWord[]>([])
   const [isLoadingWords, setIsLoadingWords] = useState(false)
   const [todaySessionCount, setTodaySessionCount] = useState(0)
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [devLoading, setDevLoading] = useState(false)
+
+  const handlePressStart = () => {
+    pressTimer.current = setTimeout(async () => {
+      setDevLoading(true)
+      try {
+        const { data } = await api.post('/auth/dev-login')
+        localStorage.setItem('access_token', data.access_token)
+        setUser(data.user, data.is_new_user)
+        toast.info('Admin 로그인 성공')
+      } catch {
+        toast.error('Admin 로그인 실패')
+      } finally {
+        setDevLoading(false)
+      }
+    }, 10000)
+  }
+
+  const handlePressEnd = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+  }
 
   useEffect(() => {
     if (isLoggedIn && !isNewUser) {
@@ -87,8 +112,16 @@ export default function HomePage() {
           <div style={styles.logoCircle}>T</div>
           <h1 style={styles.heroTitle}>TokingToking</h1>
           <p style={styles.heroSubtitle}>AI와 대화하며 영어 단어를 마스터하세요</p>
-          <button onClick={handleLogin} style={styles.loginButton}>
-            시작하기
+          <button
+            onClick={handleLogin}
+            onMouseDown={handlePressStart}
+            onMouseUp={handlePressEnd}
+            onMouseLeave={handlePressEnd}
+            onTouchStart={handlePressStart}
+            onTouchEnd={handlePressEnd}
+            style={styles.loginButton}
+          >
+            {devLoading ? '로그인 중...' : '시작하기'}
           </button>
         </div>
       </div>

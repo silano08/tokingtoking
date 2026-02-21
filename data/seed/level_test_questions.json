@@ -1,0 +1,122 @@
+[
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"How are you?\" 에 대한 가장 자연스러운 대답은?",
+    "options": ["I am fine, thank you.", "I have good.", "I is fine.", "Yes, I have."],
+    "correct_answer": "I am fine, thank you.",
+    "level": "beginner",
+    "difficulty_score": 2
+  },
+  {
+    "question_type": "fill_blank",
+    "question_text": "빈칸에 알맞은 단어는? \"I ___ to school every day.\"",
+    "options": ["go", "goes", "going", "gone"],
+    "correct_answer": "go",
+    "level": "beginner",
+    "difficulty_score": 3
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"apple\"의 뜻으로 올바른 것은?",
+    "options": ["사과", "바나나", "오렌지", "포도"],
+    "correct_answer": "사과",
+    "level": "beginner",
+    "difficulty_score": 1
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "올바른 문장은?",
+    "options": ["She is a teacher.", "She are a teacher.", "She am a teacher.", "She be a teacher."],
+    "correct_answer": "She is a teacher.",
+    "level": "beginner",
+    "difficulty_score": 2
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"What time is it?\" 의 의미는?",
+    "options": ["몇 시입니까?", "어디입니까?", "누구입니까?", "왜입니까?"],
+    "correct_answer": "몇 시입니까?",
+    "level": "beginner",
+    "difficulty_score": 1
+  },
+  {
+    "question_type": "fill_blank",
+    "question_text": "빈칸에 알맞은 것은? \"If I ___ more time, I would travel more.\"",
+    "options": ["had", "have", "has", "having"],
+    "correct_answer": "had",
+    "level": "intermediate",
+    "difficulty_score": 5
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"Despite the rain, we went outside.\" 에서 \"despite\"의 의미는?",
+    "options": ["~에도 불구하고", "~때문에", "~이후에", "~동안"],
+    "correct_answer": "~에도 불구하고",
+    "level": "intermediate",
+    "difficulty_score": 5
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "올바른 문장은?",
+    "options": ["The book which I bought yesterday is interesting.", "The book who I bought yesterday is interesting.", "The book what I bought yesterday is interesting.", "The book where I bought yesterday is interesting."],
+    "correct_answer": "The book which I bought yesterday is interesting.",
+    "level": "intermediate",
+    "difficulty_score": 6
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"take into account\"의 의미는?",
+    "options": ["고려하다", "계좌를 열다", "책임지다", "동의하다"],
+    "correct_answer": "고려하다",
+    "level": "intermediate",
+    "difficulty_score": 6
+  },
+  {
+    "question_type": "fill_blank",
+    "question_text": "빈칸에 알맞은 것은? \"She has been working here ___ 2019.\"",
+    "options": ["since", "for", "during", "while"],
+    "correct_answer": "since",
+    "level": "intermediate",
+    "difficulty_score": 5
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"The implications of this policy are far-reaching.\" 에서 \"implications\"의 의미는?",
+    "options": ["함축적 의미/영향", "적용", "구현", "설명"],
+    "correct_answer": "함축적 의미/영향",
+    "level": "advanced",
+    "difficulty_score": 8
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "문법적으로 올바른 문장은?",
+    "options": ["Had I known earlier, I would have acted differently.", "Had I knew earlier, I would have acted differently.", "If I had know earlier, I would acted differently.", "Had I known earlier, I will have acted differently."],
+    "correct_answer": "Had I known earlier, I would have acted differently.",
+    "level": "advanced",
+    "difficulty_score": 8
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"ubiquitous\"와 가장 비슷한 뜻은?",
+    "options": ["어디에나 존재하는", "독특한", "애매한", "유용한"],
+    "correct_answer": "어디에나 존재하는",
+    "level": "advanced",
+    "difficulty_score": 9
+  },
+  {
+    "question_type": "fill_blank",
+    "question_text": "빈칸에 알맞은 것은? \"Not only ___ the project on time, but she also exceeded expectations.\"",
+    "options": ["did she finish", "she finished", "she did finish", "finished she"],
+    "correct_answer": "did she finish",
+    "level": "advanced",
+    "difficulty_score": 9
+  },
+  {
+    "question_type": "multiple_choice",
+    "question_text": "\"The committee will scrutinize the proposal before making a decision.\" 에서 \"scrutinize\"의 의미는?",
+    "options": ["면밀히 검토하다", "승인하다", "거부하다", "수정하다"],
+    "correct_answer": "면밀히 검토하다",
+    "level": "advanced",
+    "difficulty_score": 8
+  }
+]
